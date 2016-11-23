@@ -1,0 +1,572 @@
+\documentclass[11pt,a4paper]{article}
+\linespread{1.25}
+\usepackage[utf8]{inputenc} % Norwegian letters
+\usepackage{natbib}
+\usepackage{amsmath}
+\usepackage{float}  % Used for minipage and stuff.
+\usepackage{wrapfig} % Wrap text around figure wrapfig [tab]
+\usepackage{graphicx}
+\usepackage{enumerate} % Use e.g. \begin{enumerate}[a)]
+\usepackage[font={small, it}]{caption} % captions on figures and tables
+\usepackage{subcaption}
+\usepackage[toc,page]{appendix} % Page make Appendices title, toc fix table of content 
+%\usepackage{todonotes} % Notes. Use \todo{"text"}. Comment out \listoftodos
+\usepackage{xargs}                      % Use more than one optional parameter in a new commands
+\usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.
+% 
+\usepackage[colorinlistoftodos,prependcaption,textsize=footnotesize]{todonotes}
+\newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+\newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommandx{\info}[2][1=]{\todo[linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}}
+\newcommandx{\improvement}[2][1=]{\todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}}
+\newcommandx{\thiswillnotshow}[2][1=]{\todo[disable,#1]{#2}}
+\usepackage{microtype} % Improves spacing. Include AFTER fonts
+\usepackage{hyperref} % Use \autoref{} and \nameref{}
+\hypersetup{backref,
+  colorlinks=true,
+  breaklinks=true,
+  %hidelinks, %uncomment to make links black
+  citecolor=blue,
+  linkcolor=blue,
+  urlcolor=blue
+}
+\usepackage[all]{hypcap} % Makes hyperref jup to top of pictures and tables
+%
+%-------------------------------------------------------------------------------
+% Page layout
+%\usepackage{showframe} % Uncomment if you want the margin frames
+\usepackage{fullpage}
+\topmargin=-0.25in
+%\evensidemargin=-0.3in
+%\oddsidemargin=-0.3in
+%\textwidth=6.9in
+%\textheight=9.5in
+\headsep=0.25in
+\footskip=0.50in
+
+%-------------------------------------------------------------------------------
+% Header and footer
+\usepackage{lastpage} % To be able to add last page in footer.
+\usepackage{fancyhdr} % Custom headers and footers
+\pagestyle{fancy} % Use "fancyplain" for header in all pages
+%\renewcommand{\chaptermark}[1]{ \markboth{#1}{} } % Usefull for book?
+\renewcommand{\sectionmark}[1]{ \markright{\thesection\ #1}{} } % Remove formating and nr.
+%\fancyhead[LE, RO]{\footnotesize\leftmark}
+%\fancyhead[RO, LE]{\footnotesize\rightmark}
+\lhead[]{\AuthorName}
+\rhead[]{\rightmark}
+\fancyfoot[L]{} % Empty left footer
+\fancyfoot[C]{} % Empty center footer
+\fancyfoot[R]{Page\ \thepage\ of\ \protect\pageref*{LastPage}} % Page numbering for right footer
+\renewcommand{\headrulewidth}{1pt} % header underlines
+\renewcommand{\footrulewidth}{1pt} % footer underlines
+\setlength{\headheight}{13.6pt} % Customize the height of the header
+
+%-------------------------------------------------------------------------------
+% Suppose to make it easier for LaTeX to place figures and tables where I want.
+\setlength{\abovecaptionskip}{0pt plus 1pt minus 2pt} % Makes caption come closer to figure.
+%\setcounter{totalnumber}{5}
+%\renewcommand{\textfraction}{0.05}
+%\renewcommand{\topfraction}{0.95}
+%\renewcommand{\bottomfraction}{0.95}
+%\renewcommand{\floatpagefraction}{0.35}
+%
+% Math short cuts for expectation, variance and covariance
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\mk}[1]{\colorbox{yellow}{#1}}
+% Commands for argmin and argmax
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%-----------------------------------------------------------------------------
+%	TITLE SECTION
+%-----------------------------------------------------------------------------
+\newcommand{\AuthorName}{Håvard Kvamme} % Your name
+
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} % Create horizontal rule command with 1 argument of height
+
+\title{\
+\normalfont \normalsize 
+\textsc{STK9101SP} \\ [25pt] % Your university, school and/or department name(s)
+\horrule{0.5pt} \\[0.4cm] % Thin top horizontal rule
+\huge Project on Survival Analysis \\ % The assignment title
+\horrule{2pt} \\[0.5cm] % Thick bottom horizontal rule
+}
+
+\author{\AuthorName} % Your name
+
+\date{\normalsize\today} % Today's date or a custom date
+\begin{document}
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\listoftodos{}
+%
+\section{Introduction}
+\todo[inline]{Introduce problem and covariates}
+
+The dataset has tied events due to the rounding of events to nearest date. Out of the 307 observations, 296 occurs alone in a single date. However, this does not affect the estimation of the Kaplan-Meier.
+
+
+\section{a) Simple univariate analysis}
+\unsure[inline]{Does univariate mean only one group??? \\I would prefer to use many several groups.}
+\unsure[inline]{Should I try to interpret the K-M plots through quantiles and stuff?? I’m pretty sure I’ve seen that somewhere. Show median survival times for different groups?}
+
+
+\begin{figure}[h!tbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{./figures/km_beh.pdf}
+        %\caption{Alb.}
+        %\label{fig:cartAreas1}
+    \end{subfigure}%
+    \quad
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{./figures/km_ald.pdf}
+        %\caption{not alb.}
+        %\label{fig:cartTree1}
+    \end{subfigure}
+    %(or a blank line to force the subfigure onto a new line)
+    \vspace{1\baselineskip}
+    \caption{Survival curves for treatment and age. We have included histograms for the two covariates under the survival curves.}
+    \label{fig:alb}
+\end{figure}
+
+\begin{figure}[h!tbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{./figures/km_kjonn.pdf}
+        %\caption{Alb.}
+        %\label{fig:cartAreas1}
+    \end{subfigure}%
+    \quad
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{./figures/km_bil.pdf}
+        %\caption{not alb.}
+        %\label{fig:cartTree1}
+    \end{subfigure}
+    %(or a blank line to force the subfigure onto a new line)
+    \vspace{1\baselineskip}
+    \caption{Survival curves for gender and amount of bilirubin in the blood of the test subjects. We have included histograms for the two covariates under the survival curves.}
+    \label{fig:alb}
+\end{figure}
+
+\begin{figure}[h!tb]
+    \begin{center}
+        \includegraphics[scale=0.8]{./figures/km_alb.pdf}
+    \end{center}
+    \vspace{-0.8cm}
+    \caption{Survival curve for amount of albumin in the blood of the test subjects. The histogram displays the distribution of albumin among the subjects.}
+    \label{fig:alb}
+\end{figure}
+
+\begin{table}[h!tbp]
+    \centering
+    \caption{Log-rank tests on the individual covariates.}
+    \label{tab:log_rank_indiv}
+    \begin{tabular}{rrrr}
+        \hline
+        Covariate & deg. & Chisq. & $p$ \\ 
+        \hline
+        Treatment &  1 &  $0   $ & $0.853     $ \\
+        Age       &  3 &  $21  $ & $1.07e-4   $ \\ 
+        Gender    &  1 &  $3.5 $ & $0.0613    $ \\ 
+        Bilirubin &  4 &  $182 $ & $0         $ \\ 
+        Albumin   &  3 &  $68.7$ & $7.99e-15$ \\ 
+        \hline
+    \end{tabular}
+\end{table}
+
+\section{b) Univariate regression}
+\info[inline]{For categorical covariates, cox scores and log-rank are equivalent, if not ties. What with ties??}
+\unsure[inline]{How does cox handle tied data?}
+\info[inline]{Cox can fail if $x$ is wrong and we should use log or sqrt instead. Or if the hazards are not proportional.}
+
+\subsection{Treatment}
+
+Here we fitted an cox regression to the treatment covariate. We see from Table~\ref{tab:log_rank_indiv} that the treatment and placebo group are not significantly different, and thus we do not expect the cox regression to be significant either. This is because the score test in cox regression, with categorical covariates, is equivalent to the log-rank test, as long as there are no ties. We do have ties in our data, but not that many.
+
+Table~\ref{tab:cox_treatment} shows some of the results from the cox regression. First note that we display the exponentiated coefficient, as this gives the hazard ratio between the groups, as well as the 90\% confidence interval. We see that the hazard rate is close to one, and 1 is covered in the confidence interval. This indicates that there are no difference between the groups, as expected from our previous analysis.
+
+We can see that the score test in Table~\ref{tab:cox_treatment} is the same as the log-rank test in Table~\ref{tab:log_rank_indiv}, which is as expected.
+
+Also note that none of the tests for the proportional hazard assumption fails (zph).
+So the cox model seems to be a reasonable model for the treatment covariate.
+
+\input{tables/cox_treatment}
+
+
+\subsection{Age}
+
+\input{tables/cox_age}
+
+In Figure~\ref{fig:cox_age_mart} we have plotted the martingale residuals from the cox regression of age. There does not seem to be a pattern in the residuals, so the functional form of the covariate seems appropriate.
+
+\begin{figure}[h!tb]
+    \begin{center}
+        \includegraphics[scale=0.6]{./figures/cox_age_mart.pdf}
+    \end{center}
+    \vspace{-0.8cm}
+    \caption{Martingale residuals for cox regression on age.}
+    \label{fig:cox_age_mart}
+\end{figure}
+
+\subsection{Gender}
+\input{tables/cox_gender}
+
+
+\subsection{Bilirubin}
+\input{tables/cox_bilirubin}
+
+
+\subsection{Albumin}
+
+
+\subsection{Testing model assumptions}
+
+\begin{itemize}
+    \item Can plot martingale residuals vs time (observation number) and color by group. To see if the groups are evenly spread. This check the PH assumption.
+    \item Investigate martingale residuals. Figure this out!!!!
+    \item Scaled Schoenfeld residuals (lec 9 p 35) to check proportionality over time.
+    \item Schoenfeld residuals for prop. assumption (lec 9 p 38).
+    \item Check proportionality by lec 9 p 29: Plot log nelson aalen for different groups and check if they are parallel.
+    \item Practical exercise 8. Fit spline to check if log-linear effect (which is a model assumption?). How to interpret results?
+    \item \url{http://www.mwsug.org/proceedings/2006/stats/MWSUG-2006-SD08.pdf}
+\end{itemize}
+
+
+
+\section{c) Multivariate regression}
+\begin{itemize}
+    \item See Practical exercise 7 for likelihood ratio test for significance of interactions.
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+\clearpage
+\section{Dolphin Stuff}
+
+\subsection{The Dataset}
+
+All analysis was done on a directed social network of bottlenose dolphins \citep{dolphins}. The nodes are the bottlenose dolphins (genus Tursiops) of a bottlenose dolphin community living off Doubtful Sound, a fjord in New Zealand (spelled fiord in New Zealand). An edge indicates a frequent association. The dolphins were observed between 1994 and 2001.
+
+Part of what could make this network interesting, is that we can study the social interactions between highly intelligent animal other than humans. So we could for instance compare the dolphins to different species, to investigate the impact of intelligence on social structures. However, I will do no such analysis, and I will admit that the network was chosen partly because of its size. It only contains 62 dolphins, so much of the analysis is not particularly computationally expensive.
+The network is displayed in Figure~\ref{fig:dolphins}, using two different layouts. 
+%
+\begin{figure}[h!tbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{./figures/dolphins.pdf}
+        \caption{Fruchterman Reingold.}
+        %\label{fig:cartAreas1}
+    \end{subfigure}%
+    \quad
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{./figures/dolphins_circle.pdf}
+        \caption{Circular.}
+        %\label{fig:cartTree1}
+    \end{subfigure}
+    %(or a blank line to force the subfigure onto a new line)
+    \vspace{1\baselineskip}
+    \caption{Different layouts for the Dolphins network.}
+    \label{fig:dolphins}
+\end{figure}
+
+\section{Descriptive Analysis of Network Graph Characteristics}
+By descriptive analysis of networks, we usually mean summarizing statistics that can be calculated from a network. These statistics are meant to give insight to the structure of the network. The topic of structural analysis was developed primarily outside 'mainstream' statistics, and as a result, the tools are rather descriptive than inferential.
+
+For large networks some of these statistics are not possible to calculate, and instead they need to be estimated, either through sampling, or through other statistics. However, as our dataset is quite small no estimation was needed. 
+
+In this section I used the \verb+igraph+ packages for representing the network in R and calculating the different statistics. As the names of the functions are typically the same as the names of the characteristics, I will not further comment on the individual functions.
+
+
+\subsection{Vertex Characteristics}
+\label{Vertex Characteristics}
+When characterizing a network it is common to investigate the degree distribution.
+For an undirected graph $G = (V, E)$, the degree of each vertex $v \in V$ is the number of edges connected to $v$. In other words, the degree is the number of neighbors of $v$. The degree distribution is the degree frequencies of the graph, often normalized. 
+
+In Figure~\ref{fig:dolph_degree} we have displayed the degree frequencies of the Dolphins network. From the figure, we can see that some dolphins are much more connected than others. This means that it is not one large group where everyone interacts with each other, but instead some dolphins are much more social than others.
+\\
+\begin{figure}[h!tbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{./figures/dolph_degree.pdf}
+        \caption{Frequencies.}
+        \label{fig:dolph_degree}
+    \end{subfigure}%
+    \quad
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{./figures/dolph_degree_log.pdf}
+        \caption{Log scale.}
+        \label{fig:dolph_degree_log}
+    \end{subfigure}
+    %(or a blank line to force the subfigure onto a new line)
+    \vspace{1\baselineskip}
+    \caption{Degree distribution for the Dolphins network.}
+    \label{fig:dolph_degree_all}
+\end{figure}
+%
+\\
+In real world networks we often find that the degree distribution follows a power law. This is so common that there the term 'scale-free networks' has been coined to describe such networks. If a network is scale-free, most vertices will have a small degree distribution, while a couple 'hubs' will be very highly connected. It quite common that social networks are scale-free.
+
+In Figure~\ref{fig:dolph_degree_log} we see the log frequencies against the log degrees. The points do not follow a straight line, so there is no indication of a power law here.
+\\
+\\
+Another way to investigate the degrees are to plot each node's degree against the average degree its neighbors. This can possibly reveal patterns in the connectivity. 
+Figure~\ref{fig:dolph_degree_neigh} shows this plot for the Dolphins network. 
+It might look like highly connected dolphins as a tendency to interact with other highly connected dolphins, while low degree dolphins has a tendency to interact with dolphins of both higher and lower degree.
+%
+\begin{figure}[htbp]
+    \begin{center}
+        \includegraphics[scale=0.5]{./figures/dolph_degree_neigh.pdf}
+    \end{center}
+    \caption{Dolphin dataset. Degrees plotted against the average degree of the vertex's neighbors.}
+    \label{fig:dolph_degree_neigh}
+\end{figure}
+
+\subsection{Network Cohesion}
+Cohesion is concerned with how subsets are cohesive, or 'stuck together'. As an example, one could investigate if friends of friends typically also are friends.
+
+In the Dolphins network, we find that there are 62 nodes,  159 edges, 95 triangles, 27 cliques of size 4, and  3 cliques of size 5. So the largest groups of dolphins that all interact are of size 5.
+
+The density of a graph is defined as number of edges divided by potential number of edges (so a clique has density 1, while no edges refers to density 0). The Dolphins network has density $0.084$, so less than 10 \% of the vertices has an edge between them.
+
+The clustering coefficient, or transitivity, is the ratio of triplets (3 cliques) to the number of 2 stars (three nodes connected by two edges). Thus this gives the proportion of friends friends that are also friends.
+For the Dolphins we get a clustering coefficient of $0.31$.
+
+A similar way to investigate cohesiveness is through the shortest paths between vertices. As the transitivity is only concerned with neighbors, the average shortest path gives a different perspective on how closely connected the network is. 
+For our dolphins, the average shortest path is 3.36, and the longest shortest path between two dolphins (diameter of network) is 8. Networks with high transitivity, and low diameter are said to have the 'small-world' property. This property is quite common in social networks, but from the analysis so far, it is not immediately clear if the Dolphins network has this property. We will get back to this later on.
+
+\subsubsection{Cuts}
+Network cohesion can alternatively be characterized through how fragile the network is to removal of nodes or edges.
+For the Dolphins network we find that the removal of a single well-chosen vertex or edge will split the network into multiple components.
+There are actually seven dolphins that, when removed, will result in splitting the network. Their average degree is 8.29, so these are some of the more well-connected dolphins.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Mathematical Models}
+
+The characteristics we have listed so far sometimes need more context to be informative. We might need to compare their values to other networks to see if they are high or low. One way to do this, is through finding an appropriate network model for describing the network and compare its characteristics to that of the network.
+We can typically divide the network models into two set of models; mathematical and statistical. Mathematical network models are different from statistical network models in the sense that they are simpler in nature and more amendable for mathematical analysis. On the other hand, statistical models can often be a better fit of the network, though more complex.
+
+\subsection{Classical and Generalized Random Graph Models}
+
+Previously, we found that the largest clique in the Dolphins network was of size 5, and the network had 3 such cliques. 
+These statistics can be compared with a network model by drawing random graphs from the model and compute the same statistics.
+We started by simulating 1000 graphs with the same number of vertices and edges as in the Dolphins network. 
+All edges were randomly assigned with uniform probability. These graphs are referred to as classical random graphs, and are available in R through the function \verb+erdos.renyi.game+ in the \verb+igraph+ package.
+
+In the simulations we only got graphs with largest clique of 3 or 4. 0.838 of the graphs with clique value 3 and 0.162 with clique value 4. As the classical random graphs do net seem to be a particularly good fit, this indicates that the dolphins associations with each other is not completely random.
+
+By repeating the experiment, but with generalized random graphs that follows the same degree distribution as the dolphins, we get $0.004$ graphs with clique number 5 (3: 0.504, 4:  0.492, 5: 0.004). This means that the dolphins interaction patterns are not fully explained by their degree distribution either.
+The generalized random graph was fitted through the \verb+degree.sequence.game+ function in \verb+igraph+.
+\\
+\\
+Using the same simulations as above we can evaluate the clustering coefficient and average shortest path in the dolphins network. The maximum average shortest path in the classical and generalized random graph models were  2.80 and 2.91, respectively. This is quite far from the average shortest path of the dolphins, which was 3.36.  We see the same trend for the maximum clustering coefficients; 0.131 for random graphs, 0.163 for generalized random graph, and 0.309 for the dolphins.
+So clearly these models are not able to explain much of the structure in the network at all. 
+\\
+\\
+We previously mentioned that many social networks have the so called small-world property. A common way to assess this property is to compare the clustering coefficient and average shortest path length to that of a classical random graph. If the clustering coefficient exceeds that of a random graph, while the average shortest path length stays roughly the same, the network is said to have the small-world property.
+
+For our Dolphins network, both the clustering coefficient and the average shortest path are both much higher than that of the classical random graph. We therefore conclude that the net work does not have the small-world property.
+
+\subsection{Preferential Attachment Models}
+Preferential attachment models represent graphs that are constructed under the assumption that 'the rich get richer'. These models assume that you start with a graph, and when a new vertex is introduced, it is probabilistically connected to existing vertices in coherence with their degree. We will assume the probability of forming an edge is \textit{proportional} to the nodes degree.
+It has been found that the preferential attachment models are good at creating power law degree distributions. While we found, in Section~\ref{Vertex Characteristics}, that the dolphins degree distribution does not follow a power law, preferential attachment model might still produce some useful results.
+\\
+\\
+When we simulate a preferential attachment model, we grow the network by adding a new node with $m$ edges, and the edges connect to the existing nodes. Thus, we need to specify $m$ in the model. In the Dolphins network the number of edges relative to vertices is $2.56$, so we choose $m$ as 2 and 3. From the degree distribution in Figure~\ref{fig:dolph_degree}, we see that many of the dolphins only have one edge, suggesting that this model is not a particularly good idea.
+We used the \verb+barabasi.game+ function to simulate preferential attachment models.
+
+The results of the simulations can be found in Table~\ref{tab:PAM}. By comparing the results to the dolphins network with largest clique of 5, average path of 3.36, and transitivity of 0.31, we confirm that the preferential attachment models are not particularly good fits.
+\\
+%
+\begin{table}[h!tbp]
+    \centering
+    \caption{Results from 1000 simulated preferential attachment models.}
+    \label{tab:PAM}
+    \begin{tabular}{rrrr}
+        \hline
+         $m$ &  largest clique &  max avg path &  max transitivity  \\
+        \hline
+        3 &  4 & 2.496 & 0.192 \\
+        4 & 4 &  2.498 & 0.186 \\
+        \hline
+    \end{tabular}
+\end{table}
+%
+\\
+We have found no mathematical models that were a good fit for our Dolphins network.
+This suggest that there are some other non-trivial process determining the association between the dolphins.
+
+\section{Statistical Models}
+While the mathematical models in the previous section try to model different phenomena, statistical models, on the other hand, are created to be fitted to the networks. As a result, the statistical models might not be as intuitive as the mathematical models.
+
+It is common to include exogenous variables (vertex attributes) as covariates for the statistical models. This makes it possible to study these variables' effect on the formation of the network, which can  often be our main interest.
+For the Dolphins network it could for instance be interesting to see if gender, age, and size of the dolphins affected their interaction patterns. 
+Unfortunately, the dataset contains no exogenous variables, restricting us to only rely on the edge structures in the network for constructing covariates.
+
+\subsection{Exponential Random Graph Models}
+
+Exponential Random Graph Models (ERGM) are designed in direct analogy to the classical generalized linear models (GLM). 
+An ERGM is of the form
+\begin{align}
+    \text P(\mathbf{Y} = \mathbf{y}) = \frac{1}{\kappa} \exp \left\{\sum_H \theta_H g_H(\mathbf{y})\right\},
+\end{align}
+where $\mathbf{Y}$ denotes a (random) adjacency matrix for the graph $G$, $H$ is a configuration of edges, $g_H(\mathbf y)$ is an indicator of $H$ occurring in  $\mathbf y$, and $\theta_H$ is a parameter for the configuration $H$.
+
+When constructing an ERGM, we find a set of configurations $H$, e.g. edges, triangles and k-stars, and fit the $\theta_H$ parameter by maximizing the log-likelihood.
+Having said that, this often produce models that put a disproportionate weight on a small set of outcomes, resulting in a bad fit. As a result, other statistics that attempt to summarize this information has been proposed. Alternating k-star statistic, geometrically weighted degree count, and geometrically weighted edgewise shared partner distribution are three such statistics. 
+I was only able to fit the geometrically weighted degree count to the Dolphins network, as the other two statistics reported an error during the MCMC iterations.
+However, as long as the edges are included in the model, alternating k-stars is equivalent to the geometrically weighted degree count (though their interpretation is not).
+
+The geometrically weighted degree count, or GWD, is defined as
+\begin{align}
+    \text{GWD}_\gamma (\mathbf y) = \sum_{d = 0}^{N_v - 1} e^{-\gamma d}N_d(\mathbf y),
+\end{align}
+where $N_d(\mathbf y)$ is the number of vertices with degree $d$. In a sense, this approach attempts to model the degree distribution, where $\gamma > 0$ influences the extent to which higher degree nodes are likely to occur in the graph.
+
+An ERGM was fitted to the network, using edges and GWD, and  we let the \verb+ergm+ package estimate the $\gamma$ parameter. 
+The output under summarize the results.
+I do not think the \verb+dwdegree.decay+ is the same parameter as $\gamma$, though I do think they are somewhat related.  
+This was hard to understand from the documentation of \verb+ergm+. 
+\begin{verbatim}
+    ==========================
+    Summary of model fit
+    ==========================
+    
+    Formula:   g.s ~ edges + gwdegree(1, fixed = FALSE)
+    
+    Iterations:  2 out of 20 
+    
+    Monte Carlo MLE Results:
+                   Estimate Std. Error MCMC %  p-value    
+    edges           -1.8209     0.2580      0  < 1e-04 ***
+    gwdegree        -1.6541     0.4789      0 0.000564 ***
+    gwdegree.decay   0.9971     0.5929      0 0.092774 .  
+    ---
+    Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+    
+    Null Deviance: 2621  on 1891  degrees of freedom
+    Residual Deviance: 1085  on 1888  degrees of freedom
+      
+    AIC: 1091    BIC: 1107    (Smaller is better.) 
+\end{verbatim}
+Here we see that both the edges and the GWD are considered significant, though it is important to note that the theoretical justification for the asymptotic chi-squared and $F$-distributions used by \verb+ergm+ has not yet been established.
+
+The estimated coefficients can be interpreted as the log-odds of an edge being present, conditioned on the rest of the network. As the GWD and edge count are not vertex attributes, interpretation of their coefficients is hard. Therefore I will only say that the significance of GWD indicate that the degree distribution is important when modeling the dolphins interaction pattern.
+
+I have not found any source that gives me a good explanation of the \verb+gwdegree.decay+ parameter, so I will not try to interpret it.
+\\
+\\
+When we worked with the mathematical models, we could easily draw from the specified models and compare characteristics with the Dolphins network.
+ERGMs on the other hand, are probabilistic models, and not specified though a growth model. This makes them harder to simulate. There are, however, some functionality in the \verb+ergm+ library that can help us with this job. 
+When we continue to work with other statistical models, we will see that this simulation becomes harder, mainly because of lack of implemented methods in R. Therefore we will not be able to calculate the same types of characteristics as for the mathematical models, and I have instead chosen to focus on the packages' implementations for evaluating goodness of fit.
+
+\subsubsection{Goodness of Fit}
+To measure how well our fit is, we use the supplied \verb+gof.ergm+ function that simulates from the fitted model and compares different characteristics with the original network. This function is not very well documented, but it is suppose to run the ''necessary Monte Carlo simulation and calculates comparisons with the original network graph in terms of the distribution of degree, geodesic length (shortest path between nodes), and edge-wise shared partners (i.e., the number of neighbors shared by a pair of vertices defining an edge)''\citep{dolphins}.
+The plots can be found in Figure~\ref{fig:gof_ergm}.
+The ERGM model seems to have captured the degree distribution quite well. On the other hand, the geodesic length and the edge-wise shared partners are not very similar to the Dolphins network.
+%
+\begin{figure}[h!tbp]
+    \begin{center}
+        \includegraphics[scale=0.9]{./figures/gof_ergm.pdf}
+    \end{center}
+    \caption{Goodness of fit plots for ERGM model fitted to the Dolphins network. The three figures display the degree distribution, the edge-wise shared partners, and geodesic distance. The bold solid lines represent the original network, while the box-plots and the 10th and 90th quantile curves are from the MC simulations.}
+    \label{fig:gof_ergm}
+\end{figure}
+
+\subsection{Network Block Models}
+While ERGMs were analogous to GLM, network block models are analogous to classical mixture models. Standard block models assume that we have $Q$ classes, and we know which of our nodes are in each class. In our setting, we have no such classes, so instead we investigate stochastic block models, which only assumes knowledge of the total number of classes.
+
+The regular block models can be expressed as an ERGM through
+\begin{align}
+    \label{eq:block_model}
+    \text P(\mathbf{Y} = \mathbf{y}) = \frac{1}{\kappa} \exp \left\{\sum_{q, r} \theta_{q, r} L_{q, r}(\mathbf{y})\right\},
+\end{align}
+where $L_{q, r}(\mathbf{y})$ is the number of edges in the observed graph $\mathbf y$ connecting pairs of vertices of class $q$ and $r$. 
+Thus, the bock model is just a variant of the Bernoulli random graph model, with $Q^2$ edge probabilities $\pi_{q, r}$.
+
+The stochastic version assumes in addition that the nodes are randomly assigned to the classes. This is specified through the indicator variables $Z_{iq}$ relating node $i$ to class $q$. The $Z$'s are determined independently with $\text P(Z_{iq}) = \alpha_q$, and conditioned on the $Z$'s the edges are modeled though \eqref{eq:block_model}.
+Thus, a stochastic block model is a mixture of ERGMs.
+
+We fitted a stochastic block models to our Dolphins data, using the \verb+mixer+ library in R. It suggested to divide the dolphins into three classes, with estimated proportions $\alpha_q$ of 0.482, 0.353, and  0.165. So one class should contain almost half of the dolphins.
+
+\subsubsection{Goodness of Fit}
+I did not find an implementation of how to simulate from the fitted model. 
+As I was able to sample from an ERGM previously, I could possibly draw from a mixture distribution, and construct the corresponding ERGM through the \verb+gof.ergm+. However, it would require some work, and I have not quite understood how \verb+gof.ergm+ works, so it might not yield the results I think it will.
+In addition, in the next section, we work with a model I was not able to sample from, so I had to do alternative analysis there as well.
+
+The \verb+mixture+ packages supplies a set of plots displayed in Figure~\ref{fig:block_models}. At the top left, one can find the integrated classification likelihood, which is a measure similar to AIC and BIC, but adapted for clustering problems. This criterion choose 3 classes as the optimum. On the top right of Figure~\ref{fig:block_models}, we can find a reorganized adjacency matrix. This shows to what extent edges are within classes and across classes. Much of the same is displayed in the bottom right plot, where the width of the edges corresponds to the number of edges connecting the classes. From both plots we see that the network is partitioned such that two of the classes have no edges between them. 
+Finally, on the bottom left, we find the degree distribution, where the yellow histogram are the dolphins network, and the blue line is the fitted model. It does not seem like the degree distribution is particularly accurate.
+%
+\begin{figure}[h!tbp]
+    \begin{center}
+        \includegraphics[scale=0.9]{./figures/block_models.pdf}
+    \end{center}
+    \caption{Various plots summarizing the goodness of fit for the stochastic block model analysis of the Dolphins network}
+    \label{fig:block_models}
+\end{figure}
+
+\subsection{Latent Network Models}
+Latent network models are models that incorporate latent variables as part of the model specification. The stochastic block models utilize the unknown class affiliation as latent variables. Now, we will consider latent network models of the form 
+\begin{align}
+    \label{eq:latent}
+    \text P(Y_{ij} = 1 \mid \mathbf{X}_{ij} = \mathbf{x}_{ij}) = \Phi (\mu + \mathbf x_{ij}^T \mathbf \beta + \alpha(u_i, u_j)),
+\end{align}
+where $\Phi$ is the cumulative distribution function of a standard normal distribution, $\mu$ is a constant, the $u_i$'s are independent and identically distributed latent variables, $\mathbf x_{ij}$ are pair specific covariates, and $\alpha$ is a symmetric function.
+However, we do not have any pair specific covariates, so we our model is just a function of the latent variables and $\mu$.
+
+$\alpha$ can be specified in different ways, but here we only use the form $\alpha(u_i, u_j) = u_i^T \Lambda u_j$, where $\Lambda$ is a $Q \times Q$ matrix. This is called the eigenmodel.
+\\
+\\
+We fitted an eigenmodel to our Dolphins network, using the library \verb+eigenmodel+, and chose $Q=3$ as we found three mixtures in the previous section.
+
+It should be easy so sample from the model. We just need $\mu$ and $\alpha(u_i, u_j)$ to specify the probabilities in \eqref{eq:latent}.  
+As the edge assignment in this latent model is independent of the other edges, we could just sample edges from a Bernoulli distribution with probabilities specified by \eqref{eq:latent}. However, I was not able to obtain $\mu$.
+So instead, to evaluate the fit, I followed the analysis in the book \cite{kolaczyk2014}. Here we fit a model to a subset of the network, and make the model predict the rest of the network. This was done using 5-fold cross-validation. 
+
+A common evaluation metric is the ROC AUC, which is the area under the ROC curve of the predictions. Random assignment will results in AUC of approximately 0.5, while perfect classification will give AUC of 1. From our experiment we got a AUC of 0.54, so the model performs only slightly better than random edge assignment.
+This does not necessarily mean the model is a bad fit, it might just be that the network is hard to predict. For instance, edge prediction of a classical random graph would result is the same probability of all edges, and an AUC of $0.5$.
+
+\section{Summary}
+In this project we have looked at the social network of dolphins by \cite{dolphins}. We found that it was neither scale-free, nor had the small-world property. We could also not find any model that that was able to describe the social structure particularly well. 
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage{}
+\phantomsection
+\addcontentsline{toc}{chapter}{Bibliography}
+%\bibliographystyle{plain}
+%\bibliographystyle{apa}
+%\bibliographystyle{authordate4}
+%\bibliographystyle{ksfh_nat}
+\bibliographystyle{plainnat}
+\bibliography{bibliography}
+
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\clearpage
+%\begin{appendices}
+  %% Use \section
+  %% Can use \phantomsection in text to get back
+%\end{appendices}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{thebibliography}{99} % At most 99 references.
+%% Use "bibit" to generate bibitem
+%\end{thebibliography}
+%
+\end{document}
