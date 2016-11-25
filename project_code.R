@@ -138,7 +138,6 @@ survdiff(Surv(dager, dod)~bil_groups, data = pbc)
 survdiff(Surv(dager, dod)~alb_groups, data = pbc)
 
 #############################################################
-# b)
 # b) Univariat regresjon:
 # Deretter utfører du univariate Cox-regresjonsanalyser for hver av kovariatene. 
 # I denne sammenhengen ma du spesielt vurdere hvordan de numeriske kovariatene
@@ -195,7 +194,7 @@ dev.off()
 
 df = cox_res_uni(cox, 'Age')
 caption = 'Cox regression on the age covariate. score is the score test, zph is the proportional hazard test using scaled Schoenfeld-residuals.'
-label = 'tab:cox_treatment'
+label = 'tab:cox_age'
 tab =  xtable(df, caption = caption, label = label, 
               display = rep('g', 8), digits = 3)
 print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_age.tex')
@@ -204,21 +203,179 @@ print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_age.tex')
 # Small p-values indicate violation of proportionality assumption
 cox.zph(cox)
 plot(cox.zph(cox))
-
-?cox.zph
-?termplot
 termplot(cox, se=TRUE) # can be used when we fit spline in cox regression
 
-cox = coxph(Surv(dager, dod)~kjonn, data = pbc)
-?survfit
+#---------
+# Gender
+cox = coxph(Surv(dager, dod)~factor(kjonn), data = pbc)
+df = cox_res_uni(cox, 'Gender')
+caption = 'Cox regression on the gender covariate. score is the score test, zph is the proportional hazard test using scaled Schoenfeld-residuals.'
+label = 'tab:cox_gender'
+tab =  xtable(df, caption = caption, label = label, 
+              display = rep('g', 8), digits = 3)
+print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_gender.tex')
+
+#-------
+# Bilirubin
+cox = coxph(Surv(dager, dod)~bil, data = pbc)
 cox
-cox = coxph(Surv(dager, dod)~bil_groups, data = pbc)
+martres = cox$residuals
+bil = pbc$bil
+printfig('cox_bil_mart', height = 4)
+plot(gam(martres~s(bil)), se=T, ylim=c(min(martres), max(martres)), 
+     xlab='bilirubin', ylab='martingale residual')
+points(bil, martres)
+abline(0, 0, lty=4)
+dev.off()
+
+df = cox_res_uni(cox, 'Bilirubin')
+caption = 'Cox regression on the bilirubin covariate. score is the score test, zph is the proportional hazard test using scaled Schoenfeld-residuals.'
+label = 'tab:cox_bilirubin'
+tab =  xtable(df, caption = caption, label = label, 
+              display = rep('g', 8), digits = 3)
+print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_bilirubin.tex')
+
+cox = coxph(Surv(dager, dod)~pspline(bil), data = pbc)
 cox
-cox = coxph(Surv(dager, dod)~alb_groups, data = pbc)
+printfig('cox_bil_termplot', height = 4)
+termplot(cox, se=TRUE, log='x', xlab='bilirubin', 
+         ylab='partial for pspline(bilirubin)')
+dev.off()
+?termplot
+
+cox = coxph(Surv(dager, dod)~log(bil), data = pbc)
+cox
+martres = cox$residuals
+bil = pbc$bil
+printfig('cox_bil_mart_log', height = 4)
+plot(gam(martres~s(bil)), se=T, ylim=c(min(martres), max(martres)), 
+     xlab='bilirubin', ylab='martingale residual', log='')
+points(bil, martres)
+abline(0, 0, lty=4)
+dev.off()
+df = cox_res_uni(cox, 'Bilirubin')
+caption = 'Cox regression on the log-transformed bilirubin covariate. score is the score test, zph is the proportional hazard test using scaled Schoenfeld-residuals.'
+label = 'tab:cox_bilirubin_log'
+tab =  xtable(df, caption = caption, label = label, 
+              display = rep('g', 8), digits = 3)
+print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_bilirubin_log.tex')
+
+cox = coxph(Surv(dager, dod)~pspline(log(bil)), data = pbc)
 cox
 
 
+termplot(cox, se=TRUE)
+plot(gam(martres~s(log(bil))), se=T, ylim=c(min(martres), max(martres)), 
+     xlab='bilirubin', ylab='martingale residual')
+points(bil, martres)
+abline(0, 0, lty=4)
+par(mfrow=c(1, 1))
+
+#-------
+# Albumin
+cox = coxph(Surv(dager, dod)~alb, data = pbc)
+cox
+martres = cox$residuals
+alb = pbc$alb
+printfig('cox_alb_mart', height = 4)
+plot(gam(martres~s(alb)), se=T, ylim=c(min(martres), max(martres)), 
+     xlab='albumin', ylab='martingale residual')
+points(alb, martres)
+abline(0, 0, lty=4)
+dev.off()
+
+df = cox_res_uni(cox, 'Albumin')
+caption = 'Cox regression on the albumin covariate. score is the score test, zph is the proportional hazard test using scaled Schoenfeld-residuals.'
+label = 'tab:cox_albumin'
+tab =  xtable(df, caption = caption, label = label, 
+              display = rep('g', 8), digits = 3)
+print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_albumin.tex')
 
 
+#############################################################
+# c) Multivariat regresjon:
+# Endelig utfører du en multivariat Cox-regresjonsanalyse hvor betydningen 
+# av kovariatene studeres simultant. I denne analysen inng ̊ar det blant
+# annet aa:
+# (i) avgjøre hvilke kovariater som er av betydning for dødeligheten,
+# (ii) avgjøre om effekten av behandling (eller andre kovariater) 
+#      avhenger av verdien til øvrige kovariater (interaksjon),
+# (iii) kontrollere modellens forutsetninger.
 
+cox = coxph(Surv(dager, dod)~., data = pbc)
+cox = coxph(Surv(dager, dod)~factor(beh) + ald + factor(kjonn) + bil + alb, data = pbc)
+cox
+cox = coxph(Surv(dager, dod)~ald + factor(kjonn) + bil + alb, data = pbc)
+cox
+
+library(lattice)
+printfig('cor_heat', height = 5, width = 5)
+levelplot(cor(pbc[c('beh', 'ald', 'kjonn', 'bil', 'alb')]), pretty=TRUE, xlab='',
+          ylab='')
+dev.off()
+
+plot(pbc$bil, pbc$alb, log = 'x', xlab = 'billirubin', ylab='albumin')
+plot(pbc[c('beh', 'ald', 'kjonn', 'bil', 'alb')])
+
+# Test all possible first-order interactions (without treatment)
+cox = coxph(Surv(dager, dod)~ald*factor(kjonn) + bil + alb, data = pbc)
+cox # not
+cox = coxph(Surv(dager, dod)~ald*bil + factor(kjonn) + alb, data = pbc)
+cox # not
+cox = coxph(Surv(dager, dod)~ald*alb + factor(kjonn) + bil, data = pbc)
+cox # not
+cox = coxph(Surv(dager, dod)~ald + factor(kjonn)*bil + alb, data = pbc)
+cox # not
+cox = coxph(Surv(dager, dod)~ald + factor(kjonn)*alb + bil, data = pbc)
+cox # not
+cox = coxph(Surv(dager, dod)~ald + factor(kjonn) + bil*alb, data = pbc)
+cox # not
+# ... none of them are significant
+
+# Test interactions with treatment
+cox = coxph(Surv(dager, dod)~factor(beh)*ald + factor(kjonn) + bil + alb, data = pbc)
+cox 
+cox = coxph(Surv(dager, dod)~factor(beh)*factor(kjonn) + ald + bil + alb, data = pbc)
+cox 
+cox = coxph(Surv(dager, dod)~factor(beh)*bil + ald + factor(kjonn) + alb, data = pbc)
+cox 
+cox = coxph(Surv(dager, dod)~factor(beh)*alb + ald + factor(kjonn) + bil, data = pbc)
+cox 
+# ... none of them are significant
+
+
+# Test model assumptions
+cox = coxph(Surv(dager, dod)~ald + factor(kjonn) + bil + alb, data = pbc)
+cox 
+par(mfrow=c(1, 1))
+martres = cox$residuals
+ald = pbc$ald
+plot(gam(martres~s(ald)), se=T, ylim=c(min(martres), max(martres)), 
+     xlab='albumin', ylab='martingale residual')
+points(ald, martres)
+abline(0, 0, lty=4)
+
+martres = cox$residuals
+bil = pbc$bil
+plot(gam(martres~s(bil)), se=T, ylim=c(min(martres), max(martres)), 
+     xlab='bil', ylab='martingale residual')
+points(bil, martres)
+abline(0, 0, lty=4)
+
+cox.zph(cox)
+cox.zph(cox, transform = log)
+
+cox = coxph(Surv(dager, dod)~pspline(ald) + factor(kjonn) + pspline(bil) + pspline(alb), data = pbc)
+cox 
+cox = coxph(Surv(dager, dod)~ald + factor(kjonn) + pspline(bil) + alb, data = pbc)
+summary(cox)
+cox = coxph(Surv(dager, dod)~ald + factor(kjonn) + log(bil) + alb, data = pbc)
+summary(cox)
+cox = coxph(Surv(dager, dod)~ald + log(bil) + alb, data = pbc)
+summary(cox)
+cox = coxph(Surv(dager, dod)~ald + factor(kjonn) + bil + alb, data = pbc)
+summary(cox)
+par(mfrow=c(2, 3), mai=c(1, 1, 0.1, 0.1))
+termplot(cox, se=TRUE)
+par(mfrow=c(1, 1))
 
