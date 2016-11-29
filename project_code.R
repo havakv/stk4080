@@ -314,9 +314,14 @@ cox
 
 library(lattice)
 printfig('cor_heat', height = 5, width = 5)
-levelplot(cor(pbc[c('beh', 'ald', 'kjonn', 'bil', 'alb')]), pretty=TRUE, xlab='',
-          ylab='')
+x = cor(pbc[c('beh', 'ald', 'kjonn', 'bil', 'alb')])
+row.names(x) = c('treat', 'age', 'gender', 'bil', 'alb')
+colnames(x) = row.names(x)
+levelplot(x, pretty=TRUE, xlab='', ylab='')
+#levelplot(cor(pbc[c('beh', 'ald', 'kjonn', 'bil', 'alb')]), pretty=TRUE, xlab='',
+#          ylab='')
 dev.off()
+?levelplot
 
 plot(pbc$bil, pbc$alb, log = 'x', xlab = 'billirubin', ylab='albumin')
 plot(pbc[c('beh', 'ald', 'kjonn', 'bil', 'alb')])
@@ -405,7 +410,7 @@ cox.zph(cox, transform = log)
 # Interpret model
 cs = summary(cox)
 cs
-df = data.frame(cs$coefficients)
+df = data.frame(cs$coefficients, check.names = FALSE)
 row.names(df) = c('age', 'log(bilirubin)', 'albimin')
 caption = 'Coefficinets for cox regression.'
 label = 'tab:cox_final'
@@ -415,7 +420,7 @@ print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_final.tex')
 
 pars = cs$conf.int
 pars
-df = data.frame(pars)
+df = data.frame(pars, check.names = FALSE)
 row.names(df) = c('age', 'log(bilirubin)', 'albimin')
 caption = 'CI for cox regression.'
 label = 'tab:cox_final_ci'
@@ -425,18 +430,18 @@ print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_final_ci.tex')
 
 cs$sctest
 zph = cox.zph(cox)
-df = data.frame(zph$table)
+df = data.frame(zph$table, check.names = FALSE)
 row.names(df) = c('age', 'log(bilirubin)', 'albimin', 'GLOBAL')
-caption = 'Test for time dependancy.'
+caption = 'Test for proportional hazard using Schoenfeld-residuals. K-M transfromed.'
 label = 'tab:cox_time_dep'
 tab =  xtable(df, caption = caption, label = label, 
               display = rep('g', 4), digits = 3)
 print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_time_dep.tex')
 
 zph_log = cox.zph(cox, transform = log)
-df = data.frame(zph_log$table)
+df = data.frame(zph_log$table, check.names = FALSE)
 row.names(df) = c('age', 'log(bilirubin)', 'albimin', 'GLOBAL')
-caption = 'Test for time dependancy. Log transformed.'
+caption = 'Test for proportional hazard using Schoenfeld-residuals. Log transformed.'
 label = 'tab:cox_time_dep_log'
 tab =  xtable(df, caption = caption, label = label, 
               display = rep('g', 4), digits = 3)

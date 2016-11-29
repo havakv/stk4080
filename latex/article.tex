@@ -339,19 +339,25 @@ The only model with significant interaction was the gender-bilirubin interaction
 \todo[inline]{Show code for this in appendix}
 
 Our final model therefore contains age, bilirubin, and albumin, without any interactions. We therefore conclude that there is no evidence that the treatment has an effect on the patients.
-
 \todo[inline]{Mention again that age could just be age\ldots}
+
+In Table~\ref{tab:cox_final} and~\ref{tab:cox_final_ci} we show the resuting coefficients with confidence intervals and $p$-values. We see that the coefficient for age has not changes from the univariate case, while the coefficients for bilirubin and albumin has changed more. This probably because there is a stronger dependence between bilirubin and albumin.
+
+\todo[inline]{Interpret coefficients}
+
 \input{./tables/cox_final}
 
 \input{./tables/cox_final_ci}
 
 The score test of the final model has a $p$-value $< 1e-16$.
 
+In Table~\ref{tab:cox_time_dep} and~\ref{tab:cox_time_dep_log} we have tested the proportional hazard assumption of the model, using Schoenfeld-residuals. We see that non of the test indicate that there is a time dependency in the hazards. However, we find lowest $p$-values for the albumin covariate, so it could be interesting to further investigate this. This was, however, not pursued in this project.
+
 \input{./tables/cox_time_dep}
 
 \input{./tables/cox_time_dep_log}
 
-To test for inclusion of 
+In Figure~\ref{fig:cox_full_linearity}, we have plotted the martingale residuals against the individual covariates. The residual seem to be evenly distributed around zero, suggesting that the functional form of our covariates are appropriate.
 
 \begin{figure}[h!tb]
     \begin{center}
