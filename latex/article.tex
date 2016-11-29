@@ -178,7 +178,8 @@ Bilirubin, however, seem to have a possibly large effect on the survival. Compar
     \label{fig:km_kjonn_bil}
 \end{figure}
 
-Finally, we investigated the relationship between the concentration of albumin and the survival function in Figure~\ref{fig:km_alb}. Immediately, it is apparent that individuals with a higher concentration, also has higher death rates. The log-rank test also considers albumin as very significant.
+Finally, we investigated the relationship between the concentration of albumin and the survival function in Figure~\ref{fig:km_alb}. Immediately, it is apparent that individuals with a lower concentration, has higher death rates. This is surprising, as a high concentration of albumin is usually connected to lowered functionality in the liver (see assignment text).
+The log-rank test also considers albumin as very significant.
 
 \begin{figure}[h!tb]
     \begin{center}
@@ -211,25 +212,29 @@ Finally, we investigated the relationship between the concentration of albumin a
 \unsure[inline]{How does cox handle tied data?}
 \info[inline]{Cox can fail if $x$ is wrong and we should use log or sqrt instead. Or if the hazards are not proportional.}
 
+Second, we analyzed the individual covariates by univariate Cox regression.
+As mentioned in the introduction, tied data poses a problem for Cox regression, but as we have few ties, the Efron approximation should be quite good.
+
 \subsection{Treatment}
 
-Here we fitted an cox regression to the treatment covariate. We see from Table~\ref{tab:log_rank_indiv} that the treatment and placebo group are not significantly different, and thus we do not expect the cox regression to be significant either. This is because the score test in cox regression, with categorical covariates, is equivalent to the log-rank test, as long as there are no ties. We do have ties in our data, but not that many.
+We start by fitting a cox regression to the treatment covariate. From the previous log-rank test in Table~\ref{tab:log_rank_indiv}, we found that the treatment and placebo groups are not significantly different, and thus we do not expect the cox regression to be significant either. This is because the score test in cox regression, with categorical covariates, is equivalent to the log-rank test, as long as there are no ties. We do have ties in our data, but not that many.
 
-Table~\ref{tab:cox_treatment} shows some of the results from the cox regression. First note that we display the exponentiated coefficient, as this gives the hazard ratio between the groups, as well as the 90\% confidence interval. We see that the hazard rate is close to one, and 1 is covered in the confidence interval. This indicates that there are no difference between the groups, as expected from our previous analysis.
+Table~\ref{tab:cox_treatment} shows some of the results from the cox regression. First note that we display the exponentiated coefficient, as this gives the hazard ratio between the groups, as well as the 95\% confidence interval. We see that the hazard rate is close to one, and 1 is covered in the confidence interval. This indicates that there are no difference between the groups, as expected from our previous analysis.
 
 We can see that the score test in Table~\ref{tab:cox_treatment} is the same as the log-rank test in Table~\ref{tab:log_rank_indiv}, which is as expected.
 
-Also note that none of the tests for the proportional hazard assumption fails (zph).
-So the cox model seems to be a reasonable model for the treatment covariate.
+The columns \verb+zph km p+ and \verb+zph log p+ gives the $p$-value from the \verb+cox.zph+ function in R. This is a test for the proportional hazard assumption, using Schoenfeld-residuals. \verb+km+ and \verb+log+ denotes the Kaplan-Meier and log transform of the survival times. We see from the table than none of the tests suggest that the proportional hazard assumption is false.
 
 \input{tables/cox_treatment}
 
-
 \subsection{Age}
+
+Next, we fit a Cox regression to the age covariate, yielding the results in Table~\ref{tab:cox_age}. According to the score test, the age covariate is considered significant.  The regression coefficient is quite small, but this is not surprising as the age is coded in years (in stead of e.g.\ decades). It suggest that the hazard ratio between two individuals with a age difference of one year is $1.04$.
+None of the zph tests suggest that the proportional hazard assumption is violated.
 
 \input{tables/cox_age}
 
-In Figure~\ref{fig:cox_age_mart} we have plotted the martingale residuals from the cox regression of age. There does not seem to be a pattern in the residuals, so the functional form of the covariate seems appropriate.
+In Figure~\ref{fig:cox_age_mart} we have plotted the martingale residuals from the cox regression. There does not seem to be a pattern in the residuals, so the functional form of the age covariate seems appropriate. The dense line in the figure shows a GAM fitted to a smoothing spline of the covariate, while the stippled lines give the upper and lower pointwise twice-standard-error curves.
 
 \begin{figure}[h!tb]
     \begin{center}
@@ -241,21 +246,23 @@ In Figure~\ref{fig:cox_age_mart} we have plotted the martingale residuals from t
 \end{figure}
 
 \subsection{Gender}
+
+Next, we fitted a Cox regression to the gender covariate. As it is categorical, the score test in Table~\ref{tab:cox_gender} gives the same result as the log-rank test in Table~\ref{tab:log_rank_indiv}. In addition we see here that the zph tests suggest that the proportional hazard assumptions seem appropriate.
+
 \input{tables/cox_gender}
 
 
 \subsection{Bilirubin}
 
-We fit a cox regression to the bilirubin covariate, and the results can be found in Table~\ref{tab:cox_bilirubin}, and the Martingale residuals in Figure~\ref{fig:cox_bil_mart}. The score test give a $p$-value of 0, but the we see a clear pattern in the martingale residuals. We therefore fit a cox regression with a cubic smoothing-spline to the bilirubin covariate, and got that both the linear and non-linear part was highly significant ($p < 1e-9$, table exempt).
+Next, we fit a Cox regression to the bilirubin covariate. Results can be found in Table~\ref{tab:cox_bilirubin}, and the Martingale residuals in Figure~\ref{fig:cox_bil_mart}. The score test give a $p$-value of 0, but the we see a clear pattern in the martingale residuals. We therefore fit a Cox regression with a cubic smoothing-spline to the bilirubin covariate, and got that both the linear and non-linear part was highly significant ($p < 1e-9$, table exempt).
 
-The shape of the martingale residuals might suggest that a log-transform of the bilirubin variable could be a better fit. We also plot the spline term against the amount of bilirubin in Figure~\ref{fig:cox_bil_termplot}, where the x-axis is logarithmically scaled. We see that the line is almost linear, supporting our claim that a log-transform might be suitable.
+The shape of the martingale residuals might suggest that a log transform of the bilirubin variable could be a better fit. We also plot the spline term against the amount of bilirubin in Figure~\ref{fig:cox_bil_termplot}, where the x-axis is logarithmically scaled. We see that the line is almost linear, supporting our claim that a log transform might be suitable.
 
-Next we fitted a cox regression to the log transformed bilirubin covariates, yielding the results in Table~\ref{tab:cox_bilirubin_log}.
-
-The martingale residuals were plotted in Figure~\ref{fig:cox_bil_mart_log}, where the residuals are evenly distributed around zero. This again support our log-transform.
+Next we fitted a Cox regression to the log transformed bilirubin covariates, yielding the results in Table~\ref{tab:cox_bilirubin_log}.
+The martingale residuals were plotted in Figure~\ref{fig:cox_bil_mart_log}, where the residuals are evenly distributed around zero. This again support our log transform.
+We see from the zph test that there is nothing suggesting that the proprtional hazard assumption is inappropriate. 
 
 \input{tables/cox_bilirubin}
-\unsure[inline]{Something on how log transform is reasonable. That differences are more important for small values of bilirubin than large.}
 
 \begin{figure}[h!tb]
     \begin{center}
@@ -288,6 +295,13 @@ The martingale residuals were plotted in Figure~\ref{fig:cox_bil_mart_log}, wher
 \input{tables/cox_bilirubin_log}
 
 \subsection{Albumin}
+
+Finally, we fitted a Cox regression to the albumin covariate. From Table~\ref{tab:cox_albumin} we see that the score test consider the albumin covariate as significant.
+According to the coefficient, we again see that a lower concentration of albumin is related to higher death rate.
+From the martingale residuals in Figure~\ref{fig:cox_alb_mart}, the functional form of the covariate seems appropriate. 
+However, the log transform of the proportional hazard test (\verb+zph log p+) is quite low, suggesting that there might be some time dependence in the hazards.
+There are different ways of handling this time dependence, but non of them were further pursued here.
+
 \input{tables/cox_albumin}
 
 \begin{figure}[h!tb]
@@ -300,30 +314,15 @@ The martingale residuals were plotted in Figure~\ref{fig:cox_bil_mart_log}, wher
 \end{figure}
 
 
-\subsection{Testing model assumptions}
-
-\begin{itemize}
-    \item Can plot martingale residuals vs time (observation number) and color by group. To see if the groups are evenly spread. This check the PH assumption.
-    \item Investigate martingale residuals. Figure this out!!!!
-    \item Scaled Schoenfeld residuals (lec 9 p 35) to check proportionality over time.
-    \item Schoenfeld residuals for prop. assumption (lec 9 p 38).
-    \item Check proportionality by lec 9 p 29: Plot log nelson aalen for different groups and check if they are parallel.
-    \item Practical exercise 8. Fit spline to check if log-linear effect (which is a model assumption?). How to interpret results?
-    \item \url{http://www.mwsug.org/proceedings/2006/stats/MWSUG-2006-SD08.pdf}
-\end{itemize}
-
-
 
 \section{c) Multivariate regression}
-\begin{itemize}
-    \item See Practical exercise 7 for likelihood ratio test for significance of interactions.
-\end{itemize}
-
 \info[inline]{Mention that we tested everything without log-transform, and it was worse}
 
+The last part of this assignment was to fit a multivariate Cox regression to the covariates, and find a model that describes the survival.
 
-We see from Figure~\ref{fig:cor_heat} that the covariates are not particularly correlated. The highest (in absolute value) is between bilirubin and albumin on approximately $-0.4$. And from a quick look at all the covariates plotted against each other, there does not seem to be any non-linear effect that cause the low correlations (figures not included).
-\change[inline]{Give English names to the covariates in the correlations figure}
+As a first step, we found the correlations between the covariates. From Figure~\ref{fig:cor_heat} we see that the covariates are not particularly correlated. The highest (in absolute value) is between bilirubin and albumin on approximately $-0.4$. And from a quick look at all the covariates plotted against each other, there does not seem to be any non-linear effect that cause the low correlations (figures not included).
+
+In this section we only work with the log transformed bilirubin covariate, as we found that is was an appropriate transform in the previous section.
 %
 \begin{figure}[h!tb]
     \begin{center}
@@ -334,11 +333,14 @@ We see from Figure~\ref{fig:cor_heat} that the covariates are not particularly c
     \label{fig:cor_heat}
 \end{figure}
 
-We started with all covariates and removed the ones that were not significant one by one. Thus we ended up with a mode containing age, log-transformed bilirubin, and albumin.
-After that, we added first order interaction to the models. This was first done for the model with age, log bilirubin, and albumin, where we only tested one interaction pair at a time (so first model as \verb$age * log(bil) + alb$). We then repeated the experiment with gender and treatment (one at a time). We did not use an ANOVA table to check the difference between the models, as all models except one had non-significant (on $5\%$ level) interactions.
+To find an appropriate set of covariates for the Cox model, we started with all covariates and removed the ones that were not significant one by one. Thus we ended up with a model containing age, bilirubin, and albumin.
+After that, we added first order interaction to the models. This was first done for the model with age, bilirubin, and albumin, where we only tested one interaction pair at a time. We then repeated this interaction experiment with gender and treatment (one at a time). We did not use an ANOVA table to check the difference between the models, as all models except one had non-significant (on $5\%$ level) interactions.
 The only model with significant interaction was the gender-bilirubin interaction (at $p=0.023$.) However, this made the bilirubin covariate not significant. Investigating Figure~\ref{fig:km_kjonn_bil} we see that there are a lot more women than man in the dataset, which probably cause the gender-bilirubin interaction to just replace the bilirubin covariate. As a result we do not use this model further.
 \todo[inline]{Show code for this in appendix}
 
+Our final model therefore contains age, bilirubin, and albumin, without any interactions. We therefore conclude that there is no evidence that the treatment has an effect on the patients.
+
+\todo[inline]{Mention again that age could just be age\ldots}
 \input{./tables/cox_final}
 
 \input{./tables/cox_final_ci}

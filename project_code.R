@@ -18,7 +18,7 @@ head(pbc)
 # plot(pbc$beh, pbc$dod)
 # plot(pbc)
 # plot(pbc$kjonn, pbc$ald)
- 
+?cox.zph 
 
 # Not unique death / censor times
 # We have tied data because of rounding to nearest day.
@@ -293,7 +293,6 @@ label = 'tab:cox_albumin'
 tab =  xtable(df, caption = caption, label = label, 
               display = rep('g', 8), digits = 3)
 print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_albumin.tex')
-
 
 #############################################################
 # c) Multivariat regresjon:
