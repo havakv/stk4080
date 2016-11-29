@@ -105,15 +105,37 @@
 %
 \section{Introduction}
 \todo[inline]{Introduce problem and covariates}
+This project is the first part of the final exam in STK4080/9080.
 
-The dataset has tied events due to the rounding of events to nearest date. Out of the 307 observations, 296 occurs alone in a single date. However, this does not affect the estimation of the Kaplan-Meier.
+Primary biliary cirrhosis, or PBC, is a rare liver decease. We do no currently know what cause this decease.  
+The American hospital Mayo followed 307 PBC patients in a double-blind study from January 1974 to May 1984, where the drug D-penicillamine was compared to placebo.
+Numerous covariates were recorded for the patients at the start of the studey, however, we will only work with a small subset of those.
+We have chosen to focus on the demographic variables gender and age, and the two biochemical covariates albumin (the dominating protein in blood plasma) and bilirubin (a yellow compompound that, in large quantities, is related with liver malfunction).
+
+\begin{itemize}
+    \item \verb+days+: Days from randomization to death or censoring. 
+    \item \verb++: 
+    \item \verb++: 
+    \item \verb++: 
+\end{itemize}
+
+The dataset has tied events due to the rounding of events to nearest date. Out of the 307 observations, 296 occurs alone in a single date. However, this does not affect the estimation of the Kaplan-Meier. 
+For Cox regression however, ties can be a problem. There are different ways to handle ties here, but as there are very few ties compared to the size of the dataset, the different methods should yield more or less equivalent results. We therefore only use the Efron approximation in all our experiments.
 
 
 \section{a) Simple univariate analysis}
-\unsure[inline]{Does univariate mean only one group??? \\I would prefer to use many several groups.}
 \unsure[inline]{Should I try to interpret the K-M plots through quantiles and stuff?? I’m pretty sure I’ve seen that somewhere. Show median survival times for different groups?}
 
+To start with, we analyze the relationship between the death rates and the covariates, individually.
 
+Figure~\ref{fig:km_beh_ald},~\ref{fig:km_kjonn_bil}, and~\ref{fig:km_alb} shows the survival curves (Kaplan-Meier plots) for the individual covariates. 
+Under each plot we have added a histogram for the covariates. This is helpful for choosing the binning of numerical covariates.
+
+To the left in Figure~\ref{fig:km_beh_ald} we see that there seems to be very little difference between the treatment and placebo patients. There nothing here that suggest that treatment has a positive effect. Table~\ref{tab:log_rank_indiv} shows the log-rank test for the individual covariates, and we see here that treatment is not considered significant.
+
+To the right in Figure~\ref{fig:km_beh_ald} we see the survival curves for different age groups. There is quite a large difference between the oldest patients and the younger patients, suggesting that age play an important part in the death of the PBC patients. We also the that the age groups are considered significant by the log-rank test in Table~\ref{tab:log_rank_indiv}.
+However, I do not know how deaths are recorded in the dataset. If deaths cause by something not related to the PBC are recorded as deaths, it is possible that we only see the effect age has on humans in general.  To truly say something about age, we should have a group of individuals without PBC and compare the death rates between the groups.
+%
 \begin{figure}[h!tbp]
     \centering
     \begin{subfigure}[b]{0.48\textwidth}
@@ -130,9 +152,13 @@ The dataset has tied events due to the rounding of events to nearest date. Out o
     %(or a blank line to force the subfigure onto a new line)
     \vspace{1\baselineskip}
     \caption{Survival curves for treatment and age. We have included histograms for the two covariates under the survival curves.}
-    \label{fig:alb}
+    \label{fig:km_beh_ald}
 \end{figure}
 
+In Figure~\ref{fig:km_kjonn_bil}, we see the survival curves for gender and bilirubin. The figure might suggest that males has a higher hazard than females, but we see from the bar chart that there are quite few males in the dataset, so the difference might just be a results of small sample size. The log-rank test supports this hypothesis, as the $p$-value is quite small, but not very small.
+
+Bilirubin, however, seem to have a possibly large effect on the survival. Comparing the death ratios between the groups with the highest and lowest concentration of bilirubin, the difference is quite striking. Of course bilirubin is considered significant by the log-rank test.
+%
 \begin{figure}[h!tbp]
     \centering
     \begin{subfigure}[b]{0.48\textwidth}
@@ -149,8 +175,10 @@ The dataset has tied events due to the rounding of events to nearest date. Out o
     %(or a blank line to force the subfigure onto a new line)
     \vspace{1\baselineskip}
     \caption{Survival curves for gender and amount of bilirubin in the blood of the test subjects. We have included histograms for the two covariates under the survival curves.}
-    \label{fig:alb}
+    \label{fig:km_kjonn_bil}
 \end{figure}
+
+Finally, we investigated the relationship between the concentration of albumin and the survival function in Figure~\ref{fig:km_alb}. Immediately, it is apparent that individuals with a higher concentration, also has higher death rates. The log-rank test also considers albumin as very significant.
 
 \begin{figure}[h!tb]
     \begin{center}
@@ -158,7 +186,7 @@ The dataset has tied events due to the rounding of events to nearest date. Out o
     \end{center}
     \vspace{-0.8cm}
     \caption{Survival curve for amount of albumin in the blood of the test subjects. The histogram displays the distribution of albumin among the subjects.}
-    \label{fig:alb}
+    \label{fig:km_alb}
 \end{figure}
 
 \begin{table}[h!tbp]
@@ -227,7 +255,7 @@ Next we fitted a cox regression to the log transformed bilirubin covariates, yie
 The martingale residuals were plotted in Figure~\ref{fig:cox_bil_mart_log}, where the residuals are evenly distributed around zero. This again support our log-transform.
 
 \input{tables/cox_bilirubin}
-\unsure[inline]{Something on how log transform is reasonable.}
+\unsure[inline]{Something on how log transform is reasonable. That differences are more important for small values of bilirubin than large.}
 
 \begin{figure}[h!tb]
     \begin{center}
@@ -291,8 +319,11 @@ The martingale residuals were plotted in Figure~\ref{fig:cox_bil_mart_log}, wher
     \item See Practical exercise 7 for likelihood ratio test for significance of interactions.
 \end{itemize}
 
+\info[inline]{Mention that we tested everything without log-transform, and it was worse}
+
 
 We see from Figure~\ref{fig:cor_heat} that the covariates are not particularly correlated. The highest (in absolute value) is between bilirubin and albumin on approximately $-0.4$. And from a quick look at all the covariates plotted against each other, there does not seem to be any non-linear effect that cause the low correlations (figures not included).
+\change[inline]{Give English names to the covariates in the correlations figure}
 %
 \begin{figure}[h!tb]
     \begin{center}
@@ -303,10 +334,31 @@ We see from Figure~\ref{fig:cor_heat} that the covariates are not particularly c
     \label{fig:cor_heat}
 \end{figure}
 
-We started with all covariates and removed the ones that were not significant (just treatment).
+We started with all covariates and removed the ones that were not significant one by one. Thus we ended up with a mode containing age, log-transformed bilirubin, and albumin.
+After that, we added first order interaction to the models. This was first done for the model with age, log bilirubin, and albumin, where we only tested one interaction pair at a time (so first model as \verb$age * log(bil) + alb$). We then repeated the experiment with gender and treatment (one at a time). We did not use an ANOVA table to check the difference between the models, as all models except one had non-significant (on $5\%$ level) interactions.
+The only model with significant interaction was the gender-bilirubin interaction (at $p=0.023$.) However, this made the bilirubin covariate not significant. Investigating Figure~\ref{fig:km_kjonn_bil} we see that there are a lot more women than man in the dataset, which probably cause the gender-bilirubin interaction to just replace the bilirubin covariate. As a result we do not use this model further.
+\todo[inline]{Show code for this in appendix}
+
+\input{./tables/cox_final}
+
+\input{./tables/cox_final_ci}
+
+The score test of the final model has a $p$-value $< 1e-16$.
+
+\input{./tables/cox_time_dep}
+
+\input{./tables/cox_time_dep_log}
 
 To test for inclusion of 
 
+\begin{figure}[h!tb]
+    \begin{center}
+        \includegraphics[scale=0.8]{./figures/cox_full_linearity.pdf}
+    \end{center}
+    \vspace{-0.8cm}
+    \caption{Martingale residuals for the full model. The lines are a GAM fitted to a smoothing spline of the relevant covariate. The bounds are the upper and lower pointwise twice-standard-error curves.}
+    \label{fig:cox_full_linearity}
+\end{figure}
 
 
 

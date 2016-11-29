@@ -24,6 +24,8 @@ head(pbc)
 # We have tied data because of rounding to nearest day.
 length(pbc$dager) 
 length(unique(pbc$dager))
+sort(pbc$dager)
+?coxph
 #----------
 # a) Enkle univariate analyser:
 # Først utfører du enkle univariate analyser ved hjelp av Kaplan-Meier plot og 
@@ -253,6 +255,7 @@ plot(gam(martres~s(bil)), se=T, ylim=c(min(martres), max(martres)),
 points(bil, martres)
 abline(0, 0, lty=4)
 dev.off()
+
 df = cox_res_uni(cox, 'Bilirubin')
 caption = 'Cox regression on the log-transformed bilirubin covariate. score is the score test, zph is the proportional hazard test using scaled Schoenfeld-residuals.'
 label = 'tab:cox_bilirubin_log'
@@ -303,9 +306,11 @@ print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_albumin.tex')
 # (iii) kontrollere modellens forutsetninger.
 
 cox = coxph(Surv(dager, dod)~., data = pbc)
-cox = coxph(Surv(dager, dod)~factor(beh) + ald + factor(kjonn) + bil + alb, data = pbc)
+cox = coxph(Surv(dager, dod)~factor(beh) + ald + factor(kjonn) + log(bil) + alb, data = pbc)
 cox
-cox = coxph(Surv(dager, dod)~ald + factor(kjonn) + bil + alb, data = pbc)
+cox = coxph(Surv(dager, dod)~ald + factor(kjonn) + log(bil) + alb, data = pbc)
+cox
+cox = coxph(Surv(dager, dod)~ald + log(bil) + alb, data = pbc)
 cox
 
 library(lattice)
@@ -317,43 +322,68 @@ dev.off()
 plot(pbc$bil, pbc$alb, log = 'x', xlab = 'billirubin', ylab='albumin')
 plot(pbc[c('beh', 'ald', 'kjonn', 'bil', 'alb')])
 
+# Test first-order combinations without gender and treatment
+cox = coxph(Surv(dager, dod)~ald * log(bil) + alb, data = pbc)
+cox #not
+cox = coxph(Surv(dager, dod)~ald * alb + log(bil), data = pbc)
+cox #not
+cox = coxph(Surv(dager, dod)~ald + log(bil) * alb, data = pbc)
+cox #not
+
 # Test all possible first-order interactions (without treatment)
-cox = coxph(Surv(dager, dod)~ald*factor(kjonn) + bil + alb, data = pbc)
+cox = coxph(Surv(dager, dod)~ald*factor(kjonn) + log(bil) + alb, data = pbc)
 cox # not
-cox = coxph(Surv(dager, dod)~ald*bil + factor(kjonn) + alb, data = pbc)
+cox = coxph(Surv(dager, dod)~ald*log(bil) + factor(kjonn) + alb, data = pbc)
+cox # ... not
+cox = coxph(Surv(dager, dod)~ald*alb + factor(kjonn) + log(bil), data = pbc)
 cox # not
-cox = coxph(Surv(dager, dod)~ald*alb + factor(kjonn) + bil, data = pbc)
+cox = coxph(Surv(dager, dod)~ald + factor(kjonn)*log(bil) + alb, data = pbc)
+cox 
+cox = coxph(Surv(dager, dod)~ald + factor(kjonn)*alb + log(bil), data = pbc)
 cox # not
-cox = coxph(Surv(dager, dod)~ald + factor(kjonn)*bil + alb, data = pbc)
+cox = coxph(Surv(dager, dod)~ald + factor(kjonn) + log(bil)*alb, data = pbc)
 cox # not
-cox = coxph(Surv(dager, dod)~ald + factor(kjonn)*alb + bil, data = pbc)
+# Investigate the interesting without gender 
+cox = coxph(Surv(dager, dod)~ald*log(bil) + alb, data = pbc)
 cox # not
-cox = coxph(Surv(dager, dod)~ald + factor(kjonn) + bil*alb, data = pbc)
-cox # not
-# ... none of them are significant
+cox = coxph(Surv(dager, dod)~ald + (kjonn)*log(bil) + alb, data = pbc)
+cox # probably because gender is so scewed. So it is basically just bil
+
 
 # Test interactions with treatment
-cox = coxph(Surv(dager, dod)~factor(beh)*ald + factor(kjonn) + bil + alb, data = pbc)
+cox = coxph(Surv(dager, dod)~factor(beh)*ald + factor(kjonn) + log(bil) + alb, data = pbc)
 cox 
-cox = coxph(Surv(dager, dod)~factor(beh)*factor(kjonn) + ald + bil + alb, data = pbc)
+cox = coxph(Surv(dager, dod)~factor(beh)*factor(kjonn) + ald + log(bil) + alb, data = pbc)
 cox 
-cox = coxph(Surv(dager, dod)~factor(beh)*bil + ald + factor(kjonn) + alb, data = pbc)
+cox = coxph(Surv(dager, dod)~factor(beh)*log(bil) + ald + factor(kjonn) + alb, data = pbc)
 cox 
-cox = coxph(Surv(dager, dod)~factor(beh)*alb + ald + factor(kjonn) + bil, data = pbc)
+cox = coxph(Surv(dager, dod)~factor(beh)*alb + ald + factor(kjonn) + log(bil), data = pbc)
+cox 
+
+cox = coxph(Surv(dager, dod)~factor(beh)*ald + log(bil) + alb, data = pbc)
+cox 
+cox = coxph(Surv(dager, dod)~factor(beh)*log(bil) + ald + alb, data = pbc)
+cox 
+cox = coxph(Surv(dager, dod)~factor(beh)*alb + ald + log(bil), data = pbc)
 cox 
 # ... none of them are significant
 
 
 # Test model assumptions
-cox = coxph(Surv(dager, dod)~ald + factor(kjonn) + bil + alb, data = pbc)
+cox = coxph(Surv(dager, dod)~ald + log(bil) + alb, data = pbc)
 cox 
-par(mfrow=c(1, 1))
+summary(cox)
+
+4/10
+printfig('cox_full_linearity', height = 3, width = 7.5)
+par(mfrow=c(1, 3))
 martres = cox$residuals
 ald = pbc$ald
 plot(gam(martres~s(ald)), se=T, ylim=c(min(martres), max(martres)), 
-     xlab='albumin', ylab='martingale residual')
+     xlab='age', ylab='martingale residual')
 points(ald, martres)
 abline(0, 0, lty=4)
+
 
 martres = cox$residuals
 bil = pbc$bil
@@ -362,8 +392,59 @@ plot(gam(martres~s(bil)), se=T, ylim=c(min(martres), max(martres)),
 points(bil, martres)
 abline(0, 0, lty=4)
 
+martres = cox$residuals
+alb = pbc$alb
+plot(gam(martres~s(alb)), se=T, ylim=c(min(martres), max(martres)), 
+     xlab='alb', ylab='martingale residual')
+points(alb, martres)
+abline(0, 0, lty=4)
+dev.off()
+
 cox.zph(cox)
 cox.zph(cox, transform = log)
+
+# Interpret model
+cs = summary(cox)
+cs
+df = data.frame(cs$coefficients)
+row.names(df) = c('age', 'log(bilirubin)', 'albimin')
+caption = 'Coefficinets for cox regression.'
+label = 'tab:cox_final'
+tab =  xtable(df, caption = caption, label = label, 
+              display = rep('g', 6), digits = 3)
+print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_final.tex')
+
+pars = cs$conf.int
+pars
+df = data.frame(pars)
+row.names(df) = c('age', 'log(bilirubin)', 'albimin')
+caption = 'CI for cox regression.'
+label = 'tab:cox_final_ci'
+tab =  xtable(df, caption = caption, label = label, 
+              display = rep('g', 5), digits = 3)
+print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_final_ci.tex')
+
+cs$sctest
+zph = cox.zph(cox)
+df = data.frame(zph$table)
+row.names(df) = c('age', 'log(bilirubin)', 'albimin', 'GLOBAL')
+caption = 'Test for time dependancy.'
+label = 'tab:cox_time_dep'
+tab =  xtable(df, caption = caption, label = label, 
+              display = rep('g', 4), digits = 3)
+print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_time_dep.tex')
+
+zph_log = cox.zph(cox, transform = log)
+df = data.frame(zph_log$table)
+row.names(df) = c('age', 'log(bilirubin)', 'albimin', 'GLOBAL')
+caption = 'Test for time dependancy. Log transformed.'
+label = 'tab:cox_time_dep_log'
+tab =  xtable(df, caption = caption, label = label, 
+              display = rep('g', 4), digits = 3)
+print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_time_dep_log.tex')
+
+
+
 
 cox = coxph(Surv(dager, dod)~pspline(ald) + factor(kjonn) + pspline(bil) + pspline(alb), data = pbc)
 cox 
