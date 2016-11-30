@@ -104,37 +104,30 @@
 %\listoftodos{}
 %
 \section{Introduction}
-\todo[inline]{Introduce problem and covariates}
+\todo[inline]{Add code}
 This project is the first part of the final exam in STK4080/9080.
 
-Primary biliary cirrhosis, or PBC, is a rare liver decease. We do no currently know what cause this decease.  
+Primary biliary cirrhosis, or PBC, is a rare liver decease. We do not currently know what cause this decease.  
 The American hospital Mayo followed 307 PBC patients in a double-blind study from January 1974 to May 1984, where the drug D-penicillamine was compared to placebo.
-Numerous covariates were recorded for the patients at the start of the studey, however, we will only work with a small subset of those.
-We have chosen to focus on the demographic variables gender and age, and the two biochemical covariates albumin (the dominating protein in blood plasma) and bilirubin (a yellow compompound that, in large quantities, is related with liver malfunction).
-
-\begin{itemize}
-    \item \verb+days+: Days from randomization to death or censoring. 
-    \item \verb++: 
-    \item \verb++: 
-    \item \verb++: 
-\end{itemize}
-
-The dataset has tied events due to the rounding of events to nearest date. Out of the 307 observations, 296 occurs alone in a single date. However, this does not affect the estimation of the Kaplan-Meier. 
-For Cox regression however, ties can be a problem. There are different ways to handle ties here, but as there are very few ties compared to the size of the dataset, the different methods should yield more or less equivalent results. We therefore only use the Efron approximation in all our experiments.
+Numerous covariates were recorded for the patients at the start of the study, of which we will only work with a small subset.
+We have chosen to focus on the demographic variables gender and age, and the two biochemical covariates albumin (the dominating protein in blood plasma) and bilirubin (a yellow compound that, in large quantities, is related with liver malfunction).
+\\
+\\
+The dataset has tied events due to the rounding of events to nearest date. Out of the 307 observations, there are 296 different days of occurrences. However, this does not affect the estimation of Kaplan-Meier. 
+For Cox regression however, ties can be a problem. There are different ways to handle ties here, but as there are very few ties compared to the size of the dataset, the methods should yield more or less equivalent results. We therefore only use the Efron approximation in all our experiments.
 
 
 \section{a) Simple univariate analysis}
-\unsure[inline]{Should I try to interpret the K-M plots through quantiles and stuff?? I’m pretty sure I’ve seen that somewhere. Show median survival times for different groups?}
 
 To start with, we analyze the relationship between the death rates and the covariates, individually.
 
 Figure~\ref{fig:km_beh_ald},~\ref{fig:km_kjonn_bil}, and~\ref{fig:km_alb} shows the survival curves (Kaplan-Meier plots) for the individual covariates. 
-Under each plot we have added a histogram for the covariates. This is helpful for choosing the binning of numerical covariates.
+Under each plot we have added a histogram for the covariates. This is helpful for choosing the grouping of numerical covariates.
 
-To the left in Figure~\ref{fig:km_beh_ald} we see that there seems to be very little difference between the treatment and placebo patients. There nothing here that suggest that treatment has a positive effect. Table~\ref{tab:log_rank_indiv} shows the log-rank test for the individual covariates, and we see here that treatment is not considered significant.
+To the left in Figure~\ref{fig:km_beh_ald} we see that there seems to be very little difference between the treatment and placebo patients. There is nothing here that suggest that treatment has a positive effect. Table~\ref{tab:log_rank_indiv} shows the log-rank test for the individual covariates, and we see here that treatment is not considered significant.
 
-To the right in Figure~\ref{fig:km_beh_ald} we see the survival curves for different age groups. There is quite a large difference between the oldest patients and the younger patients, suggesting that age play an important part in the death of the PBC patients. We also the that the age groups are considered significant by the log-rank test in Table~\ref{tab:log_rank_indiv}.
-However, I do not know how deaths are recorded in the dataset. If deaths cause by something not related to the PBC are recorded as deaths, it is possible that we only see the effect age has on humans in general.  To truly say something about age, we should have a group of individuals without PBC and compare the death rates between the groups.
+To the right in Figure~\ref{fig:km_beh_ald} we see the survival curves for different age groups. There is quite a large difference between the oldest patients and the younger patients, suggesting that age play an important part in the death of the PBC patients. We also see that the age groups are considered significant by the log-rank test in Table~\ref{tab:log_rank_indiv}.
+However, I do not know how deaths are recorded in the dataset. If deaths caused by something not related to PBC are recorded as deaths, it is possible that we only see the effect age has on humans in general.  To truly say something about age, we should have a group of individuals without PBC and compare the death rates between the groups.
 %
 \begin{figure}[h!tbp]
     \centering
@@ -178,7 +171,7 @@ Bilirubin, however, seem to have a possibly large effect on the survival. Compar
     \label{fig:km_kjonn_bil}
 \end{figure}
 
-Finally, we investigated the relationship between the concentration of albumin and the survival function in Figure~\ref{fig:km_alb}. Immediately, it is apparent that individuals with a lower concentration, has higher death rates. This is surprising, as a high concentration of albumin is usually connected to lowered functionality in the liver (see assignment text).
+Finally, we investigated the relationship between the concentration of albumin and the survival function in Figure~\ref{fig:km_alb}. Immediately, it is apparent that individuals with lower concentrations, have higher death rates. This is surprising, as a high concentration of albumin is usually connected to lowered functionality in the liver (see assignment text).
 The log-rank test also considers albumin as very significant.
 
 \begin{figure}[h!tb]
@@ -208,22 +201,19 @@ The log-rank test also considers albumin as very significant.
 \end{table}
 
 \section{b) Univariate regression}
-\info[inline]{For categorical covariates, cox scores and log-rank are equivalent, if not ties. What with ties??}
-\unsure[inline]{How does cox handle tied data?}
-\info[inline]{Cox can fail if $x$ is wrong and we should use log or sqrt instead. Or if the hazards are not proportional.}
 
 Second, we analyzed the individual covariates by univariate Cox regression.
-As mentioned in the introduction, tied data poses a problem for Cox regression, but as we have few ties, the Efron approximation should be quite good.
+As mentioned in the introduction, tied data poses a problem for Cox regression, but as we have few ties, the Efron approximation should work well.
 
 \subsection{Treatment}
 
 We start by fitting a cox regression to the treatment covariate. From the previous log-rank test in Table~\ref{tab:log_rank_indiv}, we found that the treatment and placebo groups are not significantly different, and thus we do not expect the cox regression to be significant either. This is because the score test in cox regression, with categorical covariates, is equivalent to the log-rank test, as long as there are no ties. We do have ties in our data, but not that many.
 
-Table~\ref{tab:cox_treatment} shows some of the results from the cox regression. First note that we display the exponentiated coefficient, as this gives the hazard ratio between the groups, as well as the 95\% confidence interval. We see that the hazard rate is close to one, and 1 is covered in the confidence interval. This indicates that there are no difference between the groups, as expected from our previous analysis.
+Table~\ref{tab:cox_treatment} shows some of the results from the cox regression. First note that we display the exponentiated coefficient, as this gives the hazard ratio between the groups. We also display the 95\% confidence interval. We see that the hazard rate is close to one, and 1 is covered in the confidence interval. This indicates that there are no difference between the groups, as expected from our previous analysis.
 
 We can see that the score test in Table~\ref{tab:cox_treatment} is the same as the log-rank test in Table~\ref{tab:log_rank_indiv}, which is as expected.
 
-The columns \verb+zph km p+ and \verb+zph log p+ gives the $p$-value from the \verb+cox.zph+ function in R. This is a test for the proportional hazard assumption, using Schoenfeld-residuals. \verb+km+ and \verb+log+ denotes the Kaplan-Meier and log transform of the survival times. We see from the table than none of the tests suggest that the proportional hazard assumption is false.
+The columns \verb+zph km p+ and \verb+zph log p+ gives the $p$-value from the \verb+cox.zph+ function in R. This is a test for the proportional hazard assumption, using Schoenfeld-residuals. \verb+km+ and \verb+log+ denotes the Kaplan-Meier and log transform of the survival times. We see from the table that none of the tests suggest that the proportional hazard assumption is false.
 
 \input{tables/cox_treatment}
 
@@ -254,7 +244,7 @@ Next, we fitted a Cox regression to the gender covariate. As it is categorical, 
 
 \subsection{Bilirubin}
 
-Next, we fit a Cox regression to the bilirubin covariate. Results can be found in Table~\ref{tab:cox_bilirubin}, and the Martingale residuals in Figure~\ref{fig:cox_bil_mart}. The score test give a $p$-value of 0, but the we see a clear pattern in the martingale residuals. We therefore fit a Cox regression with a cubic smoothing-spline to the bilirubin covariate, and got that both the linear and non-linear part was highly significant ($p < 1e-9$, table exempt).
+Next, we fit a Cox regression to the bilirubin covariate. Results can be found in Table~\ref{tab:cox_bilirubin}, and the Martingale residuals in Figure~\ref{fig:cox_bil_mart}. The score test give a $p$-value of 0, but we see a clear pattern in the martingale residuals, suggesting that the functional form is not correct. We therefore fit a Cox regression with a cubic smoothing-spline to the bilirubin covariate, and got that both the linear and non-linear part was highly significant ($p < 1e-9$, table exempt). This suggest that the covariate should be transformed.
 
 The shape of the martingale residuals might suggest that a log transform of the bilirubin variable could be a better fit. We also plot the spline term against the amount of bilirubin in Figure~\ref{fig:cox_bil_termplot}, where the x-axis is logarithmically scaled. We see that the line is almost linear, supporting our claim that a log transform might be suitable.
 
@@ -316,10 +306,8 @@ There are different ways of handling this time dependence, but non of them were 
 
 
 \section{c) Multivariate regression}
-\info[inline]{Mention that we tested everything without log-transform, and it was worse}
 
 The last part of this assignment was to fit a multivariate Cox regression to the covariates, and find a model that describes the survival.
-
 As a first step, we found the correlations between the covariates. From Figure~\ref{fig:cor_heat} we see that the covariates are not particularly correlated. The highest (in absolute value) is between bilirubin and albumin on approximately $-0.4$. And from a quick look at all the covariates plotted against each other, there does not seem to be any non-linear effect that cause the low correlations (figures not included).
 
 In this section we only work with the log transformed bilirubin covariate, as we found that is was an appropriate transform in the previous section.
@@ -333,7 +321,7 @@ In this section we only work with the log transformed bilirubin covariate, as we
     \label{fig:cor_heat}
 \end{figure}
 
-To find an appropriate set of covariates for the Cox model, we started with all covariates and removed the ones that were not significant one by one. Thus we ended up with a model containing age, bilirubin, and albumin.
+To find an appropriate set of covariates for the Cox model, we started with all covariates and removed the ones that were not significant, one at a time. Thus, we ended up with a model containing age, bilirubin, and albumin.
 After that, we added first order interaction to the models. This was first done for the model with age, bilirubin, and albumin, where we only tested one interaction pair at a time. We then repeated this interaction experiment with gender and treatment (one at a time). We did not use an ANOVA table to check the difference between the models, as all models except one had non-significant (on $5\%$ level) interactions.
 The only model with significant interaction was the gender-bilirubin interaction (at $p=0.023$.) However, this made the bilirubin covariate not significant. Investigating Figure~\ref{fig:km_kjonn_bil} we see that there are a lot more women than man in the dataset, which probably cause the gender-bilirubin interaction to just replace the bilirubin covariate. As a result we do not use this model further.
 \todo[inline]{Show code for this in appendix}
@@ -341,17 +329,23 @@ The only model with significant interaction was the gender-bilirubin interaction
 Our final model therefore contains age, bilirubin, and albumin, without any interactions. We therefore conclude that there is no evidence that the treatment has an effect on the patients.
 \todo[inline]{Mention again that age could just be age\ldots}
 
-In Table~\ref{tab:cox_final} and~\ref{tab:cox_final_ci} we show the resuting coefficients with confidence intervals and $p$-values. We see that the coefficient for age has not changes from the univariate case, while the coefficients for bilirubin and albumin has changed more. This probably because there is a stronger dependence between bilirubin and albumin.
+In Table~\ref{tab:cox_final} and~\ref{tab:cox_final_ci} we show the resulting coefficients with confidence intervals and $p$-values. We see that the coefficient for age has not changes from the univariate case, while the coefficients for bilirubin and albumin have changed more. This probably because there is a stronger dependence between bilirubin and albumin.
 
-\todo[inline]{Interpret coefficients}
+Coefficients ($\beta_i$) in a Cox regression are typically interpret in the following way. An increase of one unit in a covariate (give all other covariates fixed) corresponds to $\exp(\beta_i)$ ratio between the two hazards.
+For the age covariate, this means that the hazard ratio of two individuals with one year difference is $1.04$, or an increased hazard of $4\%$ for a patient that is one year older than an other (identical except age) patient. As the hazard increases exponentially with age, this is quite a large number. It could have been more fitting to use $\text{age}/ 10$, as the coefficient would possibly be more interpretable.
+
+Albumin also has an exponential relationship with the hazard, though the hazard decrease with the concentration of albumin. For an increase of one mg/dl albumin the hazard decrease with $32\%$.
+
+For bilirubin, we have used the log transform of the covariate instead of the covariate.  This makes the interpretation a bit different. For one unit increase in the logarithm of bilirubin, we have an increase of $271\%$. 
+However, as the coefficient is quite close to one, the hazard is approximately proportional to bilirubin. So a doubling of the concentration of bilirubin, corresponds to a doubling of the hazard.
+
 
 \input{./tables/cox_final}
 
 \input{./tables/cox_final_ci}
 
-The score test of the final model has a $p$-value $< 1e-16$.
 
-In Table~\ref{tab:cox_time_dep} and~\ref{tab:cox_time_dep_log} we have tested the proportional hazard assumption of the model, using Schoenfeld-residuals. We see that non of the test indicate that there is a time dependency in the hazards. However, we find lowest $p$-values for the albumin covariate, so it could be interesting to further investigate this. This was, however, not pursued in this project.
+In Table~\ref{tab:cox_time_dep} and~\ref{tab:cox_time_dep_log} we have tested the proportional hazard assumption of the model, using Schoenfeld-residuals. We see that non of the tests indicate that there is a time dependency in the hazards. However, we find the smallest $p$-values for albumin, so it could be interesting to further investigate this. That was, however, not pursued in this project.
 
 \input{./tables/cox_time_dep}
 
@@ -371,23 +365,216 @@ In Figure~\ref{fig:cox_full_linearity}, we have plotted the martingale residuals
 
 
 
+\cleardoublepage{}
+\begin{appendices}
+    \section{a) Simple univariate analysis}
+    \begin{verbatim}
+    pbc <- read.csv("~/stk4080/pbc3A.txt", sep="")
+
+    ## Treatment
+    layout(matrix(c(rep(1, 3), rep(2, 2)), nrow = 5, ncol = 1))
+    fit = survfit(Surv(dager, dod)~beh, data = pbc)
+    survfit(Surv(pbc$dager, pbc$dod)~pbc$beh)
+    plot(fit, lty=1:2, ylab='survival', xlab='days')
+    legend(1,0.2,c("treatment","placebo"), lty=1:2, bty='n')
+    grid()
+    plot(as.factor(pbc$beh), main='', ylab='frequency', xlab='treatment', col='white',
+         names.arg=c('treatment', 'placebo'))
+
+    ## Age
+    layout(matrix(c(rep(1, 3), rep(2, 2)), nrow = 5, ncol = 1))
+    pbc$ald_groups = 0
+    gr = c(0, 40, 50, 60)
+    for (i in gr) {
+      pbc$ald_groups[pbc$ald > i] = i
+      }
+    fit = survfit(Surv(dager, dod)~ald_groups, data = pbc)
+    plot(fit, lty=1:length(gr), ylab='survival', xlab='days')
+    legend(1,0.3, str_lab(gr), lty=1:length(gr), bty='n')
+    grid()
+    hist(pbc$ald, breaks = 20, main='', ylab='frequency', xlab='age')
+
+    ## Gender
+    layout(matrix(c(rep(1, 3), rep(2, 2)), nrow = 5, ncol = 1))
+    fit = survfit(Surv(dager, dod)~kjonn, data = pbc)
+    plot(fit, lty=1:2, ylab='survival', xlab='days')
+    legend(1,0.2,c("male","female"), lty=1:2, bty='n')
+    grid()
+    plot(as.factor(pbc$kjonn), main='', ylab='frequency', xlab='gender', col='white',
+         names.arg=c('male', 'female'))
 
 
+    ## Bilirubin
+    layout(matrix(c(rep(1, 3), rep(2, 2)), nrow = 5, ncol = 1))
+    pbc$bil_groups = 0
+    gr = c(0, 1, 3, 7, 15)
+    for (i in gr) {
+      pbc$bil_groups[pbc$bil > i] = i
+      }
+    fit = survfit(Surv(dager, dod)~bil_groups, data = pbc)
+    plot(fit, lty=1:length(gr), ylab='survival', xlab='days')
+    legend(1,0.4, str_lab(gr), lty=1:length(gr), bty='n')
+    grid()
+    hist(pbc$bil, breaks = 20, main='', ylab='frequency', xlab='bilirubin (mg/dl)')
+
+    ## Albumin
+    layout(matrix(c(rep(1, 3), rep(2, 2)), nrow = 5, ncol = 1))
+    pbc$alb_groups = 0
+    gr = c(0, 3, 3.5, 4)
+    for (i in gr) {
+      pbc$alb_groups[pbc$alb > i] = i
+      }
+    fit = survfit(Surv(dager, dod)~alb_groups, data = pbc)
+    plot(fit, lty=1:length(gr), ylab='survival', xlab='days')
+    legend(1, 0.4, str_lab(gr), lty=1:length(gr), bty='n')
+    grid()
+
+      hist(pbc$alb, breaks = 20, main = '', ylab = 'frequency', xlab = 'albumin (mg/dl)')
+
+    ## Log-rank tests
+    survdiff(Surv(dager, dod)~beh, data = pbc)
+    survdiff(Surv(dager, dod)~ald_groups, data = pbc)
+    survdiff(Surv(dager, dod)~kjonn, data = pbc)
+    survdiff(Surv(dager, dod)~bil_groups, data = pbc)
+    survdiff(Surv(dager, dod)~alb_groups, data = pbc)
+
+    \end{verbatim}
+
+
+
+
+
+    \section{b) Univariate regression}
+    \begin{verbatim}
+
+    cox_res_uni = function(cox, cov_name){
+      cs = summary(cox)
+      pars = cs$conf.int
+      sctest = cs$sctest[3]
+      zph = cox.zph(cox)$table[3]
+      zph_log = cox.zph(cox, transform = log)$table[3]
+               
+      df = data.frame(matrix(c(pars, sctest, zph, zph_log), nrow=1))
+      names(df) = c(colnames(pars), 'score p', 'zph km p', 'zph log p')
+      row.names(df) = cov_name
+      df
+    }
+
+    ## Treatment
+    cox = coxph(Surv(dager, dod)~beh, data = pbc)
+    df = cox_res_uni(cox, 'Treatment')
+    caption = 'Cox regression on treatment covariate. score is the score test, zph is the proportional hazard test using scaled Schoenfeld-residuals.'
+    label = 'tab:cox_treatment'
+    tab =  xtable(df, caption = caption, label = label, 
+                  display = rep('g', 8), digits = 3)
+    print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_treatment.tex')
+
+
+    ## Age
+    cox = coxph(Surv(dager, dod)~ald, data = pbc)
+    martres = cox$residuals
+    plot(pbc$ald, martres)
+    ald = pbc$ald
+    plot(gam(martres~s(ald)), se=T, ylim=c(min(martres), max(martres)), 
+        xlab='age', ylab='martingale residual')
+    points(ald, martres)
+    abline(0, 0, lty=4)
+
+    df = cox_res_uni(cox, 'Age')
+    caption = 'Cox regression on the age covariate. score is the score test, zph is the proportional hazard test using scaled Schoenfeld-residuals.'
+    label = 'tab:cox_age'
+    tab =  xtable(df, caption = caption, label = label, 
+              display = rep('g', 8), digits = 3)
+              print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_age.tex')
+
+
+    ## Gender
+    cox = coxph(Surv(dager, dod)~factor(kjonn), data = pbc)
+    df = cox_res_uni(cox, 'Gender')
+    caption = 'Cox regression on the gender covariate. score is the score test, zph is the proportional hazard test using scaled Schoenfeld-residuals.'
+    label = 'tab:cox_gender'
+    tab =  xtable(df, caption = caption, label = label, 
+              display = rep('g', 8), digits = 3)
+              print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_gender.tex')
+
+
+    ## Bilirubin
+    cox = coxph(Surv(dager, dod)~bil, data = pbc)
+    martres = cox$residuals
+    bil = pbc$bil
+    plot(gam(martres~s(bil)), se=T, ylim=c(min(martres), max(martres)), 
+     xlab='bilirubin', ylab='martingale residual')
+     points(bil, martres)
+     abline(0, 0, lty=4)
+
+     df = cox_res_uni(cox, 'Bilirubin')
+     caption = 'Cox regression on the bilirubin covariate. score is the score test, zph is the proportional hazard test using scaled Schoenfeld-residuals.'
+     label = 'tab:cox_bilirubin'
+     tab =  xtable(df, caption = caption, label = label, 
+              display = rep('g', 8), digits = 3)
+              print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_bilirubin.tex')
+
+    cox = coxph(Surv(dager, dod)~pspline(bil), data = pbc)
+    termplot(cox, se=TRUE, log='x', xlab='bilirubin', 
+    ylab='partial for pspline(bilirubin)')
+
+    cox = coxph(Surv(dager, dod)~log(bil), data = pbc)
+    martres = cox$residuals
+    bil = pbc$bil
+    plot(gam(martres~s(bil)), se=T, ylim=c(min(martres), max(martres)), 
+        xlab='bilirubin', ylab='martingale residual', log='')
+    points(bil, martres)
+    abline(0, 0, lty=4)
+
+    df = cox_res_uni(cox, 'Bilirubin')
+    caption = 'Cox regression on the log-transformed bilirubin covariate. score is the score test, zph is the proportional hazard test using scaled Schoenfeld-residuals.'
+    label = 'tab:cox_bilirubin_log'
+    tab =  xtable(df, caption = caption, label = label, 
+              display = rep('g', 8), digits = 3)
+    print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_bilirubin_log.tex')
+
+
+    ## Albumin
+    cox = coxph(Surv(dager, dod)~alb, data = pbc)
+    martres = cox$residuals
+    alb = pbc$alb
+    plot(gam(martres~s(alb)), se=T, ylim=c(min(martres), max(martres)), 
+         xlab='albumin', ylab='martingale residual')
+    points(alb, martres)
+    abline(0, 0, lty=4)
+    
+    df = cox_res_uni(cox, 'Albumin')
+    caption = 'Cox regression on the albumin covariate. score is the score test, zph is the proportional hazard test using scaled Schoenfeld-residuals.'
+    label = 'tab:cox_albumin'
+    tab =  xtable(df, caption = caption, label = label, 
+                  display = rep('g', 8), digits = 3)
+    print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_albumin.tex')
+
+
+    \end{verbatim}
+
+
+
+    \section{c) Multivariate regression}
+    \begin{verbatim}
+    \end{verbatim}
+
+\end{appendices}
 
 
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\cleardoublepage{}
-\phantomsection
-\addcontentsline{toc}{chapter}{Bibliography}
-%\bibliographystyle{plain}
-%\bibliographystyle{apa}
-%\bibliographystyle{authordate4}
-%\bibliographystyle{ksfh_nat}
-\bibliographystyle{plainnat}
-\bibliography{bibliography}
+%\cleardoublepage{}
+%\phantomsection
+%\addcontentsline{toc}{chapter}{Bibliography}
+%%\bibliographystyle{plain}
+%%\bibliographystyle{apa}
+%%\bibliographystyle{authordate4}
+%%\bibliographystyle{ksfh_nat}
+%\bibliographystyle{plainnat}
+%\bibliography{bibliography}
 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -449,7 +449,6 @@ print(tab, type = 'latex',  file = '~/stk4080/latex/tables/cox_time_dep_log.tex'
 
 
 
-
 cox = coxph(Surv(dager, dod)~pspline(ald) + factor(kjonn) + pspline(bil) + pspline(alb), data = pbc)
 cox 
 cox = coxph(Surv(dager, dod)~ald + factor(kjonn) + pspline(bil) + alb, data = pbc)
