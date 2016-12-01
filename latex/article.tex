@@ -104,7 +104,6 @@
 %\listoftodos{}
 %
 \section{Introduction}
-\todo[inline]{Add code}
 This project is the first part of the final exam in STK4080/9080.
 
 Primary biliary cirrhosis, or PBC, is a rare liver decease. We do not currently know what cause this decease.  
@@ -324,10 +323,8 @@ In this section we only work with the log transformed bilirubin covariate, as we
 To find an appropriate set of covariates for the Cox model, we started with all covariates and removed the ones that were not significant, one at a time. Thus, we ended up with a model containing age, bilirubin, and albumin.
 After that, we added first order interaction to the models. This was first done for the model with age, bilirubin, and albumin, where we only tested one interaction pair at a time. We then repeated this interaction experiment with gender and treatment (one at a time). We did not use an ANOVA table to check the difference between the models, as all models except one had non-significant (on $5\%$ level) interactions.
 The only model with significant interaction was the gender-bilirubin interaction (at $p=0.023$.) However, this made the bilirubin covariate not significant. Investigating Figure~\ref{fig:km_kjonn_bil} we see that there are a lot more women than man in the dataset, which probably cause the gender-bilirubin interaction to just replace the bilirubin covariate. As a result we do not use this model further.
-\todo[inline]{Show code for this in appendix}
 
 Our final model therefore contains age, bilirubin, and albumin, without any interactions. We therefore conclude that there is no evidence that the treatment has an effect on the patients.
-\todo[inline]{Mention again that age could just be age\ldots}
 
 In Table~\ref{tab:cox_final} and~\ref{tab:cox_final_ci} we show the resulting coefficients with confidence intervals and $p$-values. We see that the coefficient for age has not changes from the univariate case, while the coefficients for bilirubin and albumin have changed more. This probably because there is a stronger dependence between bilirubin and albumin.
 
@@ -557,6 +554,72 @@ In Figure~\ref{fig:cox_full_linearity}, we have plotted the martingale residuals
 
     \section{c) Multivariate regression}
     \begin{verbatim}
+
+    ## Correlation plot
+    x = cor(pbc[c('beh', 'ald', 'kjonn', 'bil', 'alb')])
+    row.names(x) = c('treat', 'age', 'gender', 'bil', 'alb')
+    colnames(x) = row.names(x)
+    levelplot(x, pretty=TRUE, xlab='', ylab='')
+
+
+    cox = coxph(Surv(dager, dod)~factor(beh) + ald + factor(kjonn) + log(bil) + alb,
+                data = pbc)
+    cox
+    cox = coxph(Surv(dager, dod)~ald + factor(kjonn) + log(bil) + alb, data = pbc)
+    cox
+    cox = coxph(Surv(dager, dod)~ald + log(bil) + alb, data = pbc)
+    cox
+
+
+    ## Test first-order combinations without gender and treatment
+    cox = coxph(Surv(dager, dod)~ald * log(bil) + alb, data = pbc)
+    cox 
+    cox = coxph(Surv(dager, dod)~ald * alb + log(bil), data = pbc)
+    cox 
+    cox = coxph(Surv(dager, dod)~ald + log(bil) * alb, data = pbc)
+    cox 
+
+    ## Test first-order interactions without treatment
+    cox = coxph(Surv(dager, dod)~ald*factor(kjonn) + log(bil) + alb, data = pbc)
+    cox 
+    cox = coxph(Surv(dager, dod)~ald*log(bil) + factor(kjonn) + alb, data = pbc)
+    cox 
+    cox = coxph(Surv(dager, dod)~ald*alb + factor(kjonn) + log(bil), data = pbc)
+    cox 
+    cox = coxph(Surv(dager, dod)~ald + factor(kjonn)*log(bil) + alb, data = pbc)
+    cox 
+    cox = coxph(Surv(dager, dod)~ald + factor(kjonn)*alb + log(bil), data = pbc)
+    cox 
+    cox = coxph(Surv(dager, dod)~ald + factor(kjonn) + log(bil)*alb, data = pbc)
+    cox 
+    # Investigate the interesting without gender 
+    cox = coxph(Surv(dager, dod)~ald*log(bil) + alb, data = pbc)
+    cox 
+    cox = coxph(Surv(dager, dod)~ald + (kjonn)*log(bil) + alb, data = pbc)
+    cox 
+
+
+    ## Test interactions with treatment
+    cox = coxph(Surv(dager, dod)~factor(beh)*ald + factor(kjonn) + log(bil) + alb, 
+        data = pbc)
+    cox 
+    cox = coxph(Surv(dager, dod)~factor(beh)*factor(kjonn) + ald + log(bil) + alb, 
+        data = pbc)
+    cox 
+    cox = coxph(Surv(dager, dod)~factor(beh)*log(bil) + ald + factor(kjonn) + alb,
+        data = pbc)
+    cox 
+    cox = coxph(Surv(dager, dod)~factor(beh)*alb + ald + factor(kjonn) + log(bil),
+        data = pbc)
+    cox 
+
+    cox = coxph(Surv(dager, dod)~factor(beh)*ald + log(bil) + alb, data = pbc)
+    cox 
+    cox = coxph(Surv(dager, dod)~factor(beh)*log(bil) + ald + alb, data = pbc)
+    cox 
+    cox = coxph(Surv(dager, dod)~factor(beh)*alb + ald + log(bil), data = pbc)
+    cox 
+
     \end{verbatim}
 
 \end{appendices}
